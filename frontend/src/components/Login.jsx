@@ -2,8 +2,9 @@ import React, { useState } from "react";
 import { useForm } from "react-hook-form";
 import { MessageSquareMore } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { apiUrl } from "../config";
 
-export default function Login({ apiUrl }) {
+export default function Login() {
   const {
     register,
     handleSubmit,

@@ -5,8 +5,9 @@ import moment from "moment";
 import { toast } from "react-toastify";
 import io from "socket.io-client";
 import noPhoto from "../assets/images/images.jpeg";
+import { apiUrl } from "../config";
 
-function Inbox({ loggedInUser, apiUrl }) {
+function Inbox({ loggedInUser }) {
   const [searchUserTabOpen, setSearchUserTabOpen] = useState(false);
   const [conversation, setConversation] = useState([]);
   const [participant, setParticipant] = useState(null);

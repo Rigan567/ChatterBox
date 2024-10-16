@@ -7,11 +7,11 @@ import Inbox from "./components/Inbox";
 import React, { useEffect, useState } from "react";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import { apiUrl } from "./config";
 
 export default function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [loggedInUser, setLoggedInUser] = useState(null);
-  const apiUrl = process.env.REACT_APP_API_URL;
   useEffect(() => {
     const checkLoginStatus = async () => {
       try {

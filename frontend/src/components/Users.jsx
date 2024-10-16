@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
+import { apiUrl } from "../config";
 
-function Users({ loggedInUser, apiUrl }) {
+function Users({ loggedInUser }) {
   const [users, setUsers] = useState([]);
   const fetchedUsers = async () => {
     try {
