@@ -51,47 +51,30 @@ export default function App() {
           setLoggedInUser={setLoggedInUser}
           isLoggedIn={isLoggedIn}
           setIsLoggedIn={setIsLoggedIn}
-          apiUrl={apiUrl}
         />
         <Routes>
           <Route
             path="/"
             element={
-              isLoggedIn ? (
-                <Inbox loggedInUser={loggedInUser} apiUrl={apiUrl} />
-              ) : (
-                <Login apiUrl={apiUrl} />
-              )
+              isLoggedIn ? <Inbox loggedInUser={loggedInUser} /> : <Login />
             }
           />
           <Route
             path="/signup"
             element={
-              !isLoggedIn ? (
-                <Signup apiUrl={apiUrl} />
-              ) : (
-                <Inbox loggedInUser={loggedInUser} apiUrl={apiUrl} />
-              )
+              !isLoggedIn ? <Signup /> : <Inbox loggedInUser={loggedInUser} />
             }
           />
           <Route
             path="/users"
             element={
-              isLoggedIn ? (
-                <Users loggedInUser={loggedInUser} apiUrl={apiUrl} />
-              ) : (
-                <Login apiUrl={apiUrl} />
-              )
+              isLoggedIn ? <Users loggedInUser={loggedInUser} /> : <Login />
             }
           />
           <Route
             path="/inbox"
             element={
-              isLoggedIn ? (
-                <Inbox loggedInUser={loggedInUser} apiUrl={apiUrl} />
-              ) : (
-                <Login apiUrl={apiUrl} />
-              )
+              isLoggedIn ? <Inbox loggedInUser={loggedInUser} /> : <Login />
             }
           />
         </Routes>
