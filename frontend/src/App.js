@@ -11,10 +11,11 @@ import "react-toastify/dist/ReactToastify.css";
 export default function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [loggedInUser, setLoggedInUser] = useState(null);
+  const apiUrl = process.env.REACT_APP_API_URL;
   useEffect(() => {
     const checkLoginStatus = async () => {
       try {
-        const response = await fetch("http://localhost:4000/check-login", {
+        const response = await fetch(`${apiUrl}/check-login`, {
           credentials: "include", // Include cookies for authentication
         });
         if (response.ok) {
@@ -46,30 +47,47 @@ export default function App() {
           setLoggedInUser={setLoggedInUser}
           isLoggedIn={isLoggedIn}
           setIsLoggedIn={setIsLoggedIn}
+          apiUrl={apiUrl}
         />
         <Routes>
           <Route
             path="/"
             element={
-              isLoggedIn ? <Inbox loggedInUser={loggedInUser} /> : <Login />
+              isLoggedIn ? (
+                <Inbox loggedInUser={loggedInUser} apiUrl={apiUrl} />
+              ) : (
+                <Login apiUrl={apiUrl} />
+              )
             }
           />
           <Route
             path="/signup"
             element={
-              !isLoggedIn ? <Signup /> : <Inbox loggedInUser={loggedInUser} />
+              !isLoggedIn ? (
+                <Signup apiUrl={apiUrl} />
+              ) : (
+                <Inbox loggedInUser={loggedInUser} apiUrl={apiUrl} />
+              )
             }
           />
           <Route
             path="/users"
             element={
-              isLoggedIn ? <Users loggedInUser={loggedInUser} /> : <Login />
+              isLoggedIn ? (
+                <Users loggedInUser={loggedInUser} apiUrl={apiUrl} />
+              ) : (
+                <Login apiUrl={apiUrl} />
+              )
             }
           />
           <Route
             path="/inbox"
             element={
-              isLoggedIn ? <Inbox loggedInUser={loggedInUser} /> : <Login />
+              isLoggedIn ? (
+                <Inbox loggedInUser={loggedInUser} apiUrl={apiUrl} />
+              ) : (
+                <Login apiUrl={apiUrl} />
+              )
             }
           />
         </Routes>

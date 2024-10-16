@@ -2,7 +2,12 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { EllipsisVertical } from "lucide-react";
 
-export default function Header({ loggedInUser, setIsLoggedIn, isLoggedIn }) {
+export default function Header({
+  loggedInUser,
+  setIsLoggedIn,
+  isLoggedIn,
+  apiUrl,
+}) {
   const navigate = useNavigate();
   const [eclipseOn, setEclipseOn] = useState(false);
   const [showWarning, setShowWarning] = useState(false);
@@ -10,7 +15,7 @@ export default function Header({ loggedInUser, setIsLoggedIn, isLoggedIn }) {
   // Handle Logout
   const handleLogout = async () => {
     try {
-      const response = await fetch("http://localhost:4000/logout", {
+      const response = await fetch(`${apiUrl}/logout`, {
         method: "POST",
         credentials: "include", // Ensure cookies are included
       });
@@ -24,7 +29,7 @@ export default function Header({ loggedInUser, setIsLoggedIn, isLoggedIn }) {
 
   const removeUser = async (userid) => {
     try {
-      const response = await fetch(`http://localhost:4000/users/${userid}`, {
+      const response = await fetch(`${apiUrl}/users/${userid}`, {
         method: "DELETE",
         credentials: "include",
       });
@@ -81,7 +86,7 @@ export default function Header({ loggedInUser, setIsLoggedIn, isLoggedIn }) {
                 className="border rounded-lg h-9 object-cover"
                 src={
                   loggedInUser.avatar
-                    ? `http://localhost:4000/uploads/avatars/${loggedInUser.avatar}`
+                    ? `${apiUrl}/uploads/avatars/${loggedInUser.avatar}`
                     : null
                 }
                 alt=""

@@ -6,7 +6,7 @@ import { toast } from "react-toastify";
 import io from "socket.io-client";
 import noPhoto from "../assets/images/images.jpeg";
 
-function Inbox({ loggedInUser }) {
+function Inbox({ loggedInUser, apiUrl }) {
   const [searchUserTabOpen, setSearchUserTabOpen] = useState(false);
   const [conversation, setConversation] = useState([]);
   const [participant, setParticipant] = useState(null);
@@ -20,7 +20,7 @@ function Inbox({ loggedInUser }) {
   const messageContainerRef = useRef(null); // Create a ref to the message container
 
   useEffect(() => {
-    const newSocket = io("http://localhost:4000/", {
+    const newSocket = io(`${apiUrl}/`, {
       withCredentials: true,
     });
     newSocket.on("connect", () => {
@@ -83,7 +83,7 @@ function Inbox({ loggedInUser }) {
 
   const fetchConversation = async () => {
     try {
-      const response = await fetch("http://localhost:4000/inbox", {
+      const response = await fetch(`${apiUrl}/inbox`, {
         credentials: "include",
       });
       if (!response.ok) {
@@ -102,7 +102,7 @@ function Inbox({ loggedInUser }) {
   const getMessages = async (conversation_id, conversation_name) => {
     try {
       const response = await fetch(
-        `http://localhost:4000/inbox/messages/${conversation_id}`,
+        `${apiUrl}/inbox/messages/${conversation_id}`,
         {
           credentials: "include",
         }
@@ -154,7 +154,7 @@ function Inbox({ loggedInUser }) {
     formData.append("receiverAvatar", participant.avatar || "");
     formData.append("conversationId", currentConversationId);
     try {
-      const response = await fetch("http://localhost:4000/inbox/message", {
+      const response = await fetch(`${apiUrl}/inbox/message`, {
         method: "POST",
         credentials: "include",
         body: formData,
@@ -202,7 +202,7 @@ function Inbox({ loggedInUser }) {
   const removeConversation = async (participant_id) => {
     try {
       const response = await fetch(
-        `http://localhost:4000/inbox/messages/${participant_id}`,
+        `${apiUrl}/inbox/messages/${participant_id}`,
         {
           method: "DELETE",
           credentials: "include",
@@ -243,7 +243,10 @@ function Inbox({ loggedInUser }) {
           )}
         </div>
         {searchUserTabOpen ? (
-          <SearchUserTab setSearchUserTabOpen={setSearchUserTabOpen} />
+          <SearchUserTab
+            setSearchUserTabOpen={setSearchUserTabOpen}
+            apiUrl={apiUrl}
+          />
         ) : (
           ""
         )}
@@ -262,7 +265,7 @@ function Inbox({ loggedInUser }) {
                     className="w-10 h-10 "
                     src={
                       conversation?.participant?.avatar
-                        ? `http://localhost:4000/uploads/avatars/${conversation.participant.avatar}`
+                        ? `${apiUrl}/uploads/avatars/${conversation.participant.avatar}`
                         : "/default-avatar.png"
                     } // Safe access to avatar
                     alt={`${conversation.participant?.name || "User"}'s avatar`}
@@ -286,7 +289,7 @@ function Inbox({ loggedInUser }) {
                     className="w-10 h-10 "
                     src={
                       conversation?.creator?.avatar
-                        ? `http://localhost:4000/uploads/avatars/${conversation.creator.avatar}`
+                        ? `${apiUrl}/uploads/avatars/${conversation.creator.avatar}`
                         : "/default-avatar.png"
                     } // Safe access to avatar
                     alt={`${conversation.creator?.name || "User"}'s avatar`}
@@ -311,7 +314,7 @@ function Inbox({ loggedInUser }) {
               <img
                 src={
                   participant.avatar
-                    ? `http://localhost:4000/uploads/avatars/${participant.avatar}`
+                    ? `${apiUrl}/uploads/avatars/${participant.avatar}`
                     : noPhoto
                 }
                 alt={participant?.name || "Unknown"}
@@ -340,7 +343,7 @@ function Inbox({ loggedInUser }) {
             messages.map((message, index) => {
               const sender = message.sender || {};
               const senderAvatar = sender.avatar
-                ? `http://localhost:4000/uploads/avatars/${sender.avatar}`
+                ? `${apiUrl}/uploads/avatars/${sender.avatar}`
                 : `${noPhoto}`;
 
               const isCurrentUser = sender.id === loggedInUser.userid;
@@ -372,7 +375,7 @@ function Inbox({ loggedInUser }) {
                         {message.attachment.map((attachment, idx) => (
                           <img
                             key={idx}
-                            src={`http://localhost:4000/uploads/attachments/${attachment}`}
+                            src={`${apiUrl}/uploads/attachments/${attachment}`}
                             alt="attachment"
                             className="w-16 h-16 object-cover rounded-md"
                           />

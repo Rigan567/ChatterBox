@@ -3,7 +3,7 @@ import { useForm } from "react-hook-form";
 import { MessageSquareMore } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
-export default function Login() {
+export default function Login({ apiUrl }) {
   const {
     register,
     handleSubmit,
@@ -15,7 +15,7 @@ export default function Login() {
 
   const onSubmit = async (data) => {
     try {
-      const response = await fetch("http://localhost:4000/login", {
+      const response = await fetch(`${apiUrl}/login`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

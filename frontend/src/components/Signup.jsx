@@ -3,7 +3,7 @@ import { useForm } from "react-hook-form";
 import { MessageSquareMore } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
-export default function Signup() {
+export default function Signup({ apiUrl }) {
   const {
     register,
     handleSubmit,
@@ -28,7 +28,7 @@ export default function Signup() {
     }
 
     try {
-      let response = await fetch("http://localhost:4000/users", {
+      let response = await fetch(`${apiUrl}/users`, {
         method: "POST",
         body: formData,
         credentials: "include",

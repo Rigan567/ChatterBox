@@ -2,7 +2,7 @@ import { SquareUserRound } from "lucide-react";
 import React, { useEffect, useState } from "react";
 import { toast } from "react-toastify";
 
-const SearchUserTab = ({ setSearchUserTabOpen }) => {
+const SearchUserTab = ({ setSearchUserTabOpen, apiUrl }) => {
   const [searchQuery, setSearchQuery] = useState("");
   const [searchedUsers, setSearchedUsers] = useState([]);
 
@@ -10,7 +10,7 @@ const SearchUserTab = ({ setSearchUserTabOpen }) => {
     if (searchQuery.length > 0) {
       try {
         const response = await fetch(
-          `http://localhost:4000/inbox/search?query=${searchQuery}`,
+          `${apiUrl}/inbox/search?query=${searchQuery}`,
           {
             credentials: "include",
           }
@@ -34,7 +34,7 @@ const SearchUserTab = ({ setSearchUserTabOpen }) => {
 
   const createConversation = async (participant_id, name, avatar) => {
     try {
-      const response = await fetch("http://localhost:4000/inbox/conversation", {
+      const response = await fetch(`${apiUrl}/inbox/conversation`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -85,7 +85,7 @@ const SearchUserTab = ({ setSearchUserTabOpen }) => {
                 {user.avatar ? (
                   <img
                     className="w-8 h-8"
-                    src={`http://localhost:4000/uploads/avatars/${user.avatar}`}
+                    src={`${apiUrl}/uploads/avatars/${user.avatar}`}
                   />
                 ) : (
                   <SquareUserRound className="w-8 h-8" />

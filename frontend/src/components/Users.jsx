@@ -1,11 +1,11 @@
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 
-function Users({ loggedInUser }) {
+function Users({ loggedInUser, apiUrl }) {
   const [users, setUsers] = useState([]);
   const fetchedUsers = async () => {
     try {
-      const signedUpUsers = await fetch("http://localhost:4000/users", {
+      const signedUpUsers = await fetch(`${apiUrl}/users`, {
         credentials: "include", // Ensure cookies are sent for auth
       });
 
@@ -59,7 +59,7 @@ function Users({ loggedInUser }) {
                   <div className="w-full flex items-center">
                     <div className="px-1">
                       <img
-                        src={`http://localhost:4000/uploads/avatars/${item.avatar}`}
+                        src={`${apiUrl}/uploads/avatars/${item.avatar}`}
                         className="z-10 w-8 h-8 object-cover rounded-full"
                         alt={`${item.name}'s avatar`}
                       />
