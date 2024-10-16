@@ -24,7 +24,7 @@ dotenv.config();
 const app = express();
 app.use(
   cors({
-    origin: "https://chatterbox-9gu6.onrender.com", // Your deployed frontend URL
+    origin: "http://localhost:3000",
     credentials: true,
   })
 );
@@ -32,7 +32,7 @@ app.use(
 const server = createServer(app);
 const io = new Server(server, {
   cors: {
-    origin: "https://chatterbox-9gu6.onrender.com", // Your deployed frontend URL
+    origin: "http://localhost:3000", // Allow requests from your frontend
     methods: ["GET", "POST"],
     credentials: true,
   },
@@ -79,17 +79,17 @@ app.use("/users", usersRouter);
 app.use("/inbox", inboxRouter);
 
 // ------------------------Deployment-----------------------
-const __dirname1 = path.resolve();
-if (process.env.NODE_ENV === "production") {
-  app.use(express.static(path.join(__dirname1, "/frontend/build")));
-  app.get("*", (req, res) => {
-    res.sendFile(path.resolve(__dirname1, "frontend", "build", "index.html"));
-  });
-} else {
-  app.get("/", (req, res) => {
-    res.send("API is Running Successfully");
-  });
-}
+// const __dirname1 = path.resolve();
+// if (process.env.NODE_ENV === "production") {
+//   app.use(express.static(path.join(__dirname1, "/frontend/build")));
+//   app.get("*", (req, res) => {
+//     res.sendFile(path.resolve(__dirname1, "frontend", "build", "index.html"));
+//   });
+// } else {
+//   app.get("/", (req, res) => {
+//     res.send("API is Running Successfully");
+//   });
+// }
 
 // ------------------------Deployment-----------------------
 

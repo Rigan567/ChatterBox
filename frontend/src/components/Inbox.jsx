@@ -20,7 +20,7 @@ function Inbox({ loggedInUser }) {
   const messageContainerRef = useRef(null); // Create a ref to the message container
 
   useEffect(() => {
-    const newSocket = io("https://chatterbox-9gu6.onrender.com", {
+    const newSocket = io("http://localhost:4000/", {
       withCredentials: true,
     });
     newSocket.on("connect", () => {
@@ -83,7 +83,7 @@ function Inbox({ loggedInUser }) {
 
   const fetchConversation = async () => {
     try {
-      const response = await fetch("https://chatterbox-9gu6.onrender.com/inbox", {
+      const response = await fetch("http://localhost:4000/inbox", {
         credentials: "include",
       });
       if (!response.ok) {
@@ -102,7 +102,7 @@ function Inbox({ loggedInUser }) {
   const getMessages = async (conversation_id, conversation_name) => {
     try {
       const response = await fetch(
-        `https://chatterbox-9gu6.onrender.com/inbox/messages/${conversation_id}`,
+        `http://localhost:4000/inbox/messages/${conversation_id}`,
         {
           credentials: "include",
         }
@@ -154,7 +154,7 @@ function Inbox({ loggedInUser }) {
     formData.append("receiverAvatar", participant.avatar || "");
     formData.append("conversationId", currentConversationId);
     try {
-      const response = await fetch("https://chatterbox-9gu6.onrender.com/inbox/message", {
+      const response = await fetch("http://localhost:4000/inbox/message", {
         method: "POST",
         credentials: "include",
         body: formData,
@@ -202,7 +202,7 @@ function Inbox({ loggedInUser }) {
   const removeConversation = async (participant_id) => {
     try {
       const response = await fetch(
-        `https://chatterbox-9gu6.onrender.com/inbox/messages/${participant_id}`,
+        `http://localhost:4000/inbox/messages/${participant_id}`,
         {
           method: "DELETE",
           credentials: "include",
@@ -262,7 +262,7 @@ function Inbox({ loggedInUser }) {
                     className="w-10 h-10 "
                     src={
                       conversation?.participant?.avatar
-                        ? `https://chatterbox-9gu6.onrender.com/uploads/avatars/${conversation.participant.avatar}`
+                        ? `http://localhost:4000/uploads/avatars/${conversation.participant.avatar}`
                         : "/default-avatar.png"
                     } // Safe access to avatar
                     alt={`${conversation.participant?.name || "User"}'s avatar`}
@@ -286,7 +286,7 @@ function Inbox({ loggedInUser }) {
                     className="w-10 h-10 "
                     src={
                       conversation?.creator?.avatar
-                        ? `https://chatterbox-9gu6.onrender.com/uploads/avatars/${conversation.creator.avatar}`
+                        ? `http://localhost:4000/uploads/avatars/${conversation.creator.avatar}`
                         : "/default-avatar.png"
                     } // Safe access to avatar
                     alt={`${conversation.creator?.name || "User"}'s avatar`}
@@ -311,7 +311,7 @@ function Inbox({ loggedInUser }) {
               <img
                 src={
                   participant.avatar
-                    ? `https://chatterbox-9gu6.onrender.com/uploads/avatars/${participant.avatar}`
+                    ? `http://localhost:4000/uploads/avatars/${participant.avatar}`
                     : noPhoto
                 }
                 alt={participant?.name || "Unknown"}
@@ -340,7 +340,7 @@ function Inbox({ loggedInUser }) {
             messages.map((message, index) => {
               const sender = message.sender || {};
               const senderAvatar = sender.avatar
-                ? `https://chatterbox-9gu6.onrender.com/uploads/avatars/${sender.avatar}`
+                ? `http://localhost:4000/uploads/avatars/${sender.avatar}`
                 : `${noPhoto}`;
 
               const isCurrentUser = sender.id === loggedInUser.userid;
@@ -372,7 +372,7 @@ function Inbox({ loggedInUser }) {
                         {message.attachment.map((attachment, idx) => (
                           <img
                             key={idx}
-                            src={`https://chatterbox-9gu6.onrender.com/uploads/attachments/${attachment}`}
+                            src={`http://localhost:4000/uploads/attachments/${attachment}`}
                             alt="attachment"
                             className="w-16 h-16 object-cover rounded-md"
                           />

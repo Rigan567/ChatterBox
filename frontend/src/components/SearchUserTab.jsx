@@ -10,7 +10,7 @@ const SearchUserTab = ({ setSearchUserTabOpen }) => {
     if (searchQuery.length > 0) {
       try {
         const response = await fetch(
-          `https://chatterbox-9gu6.onrender.com/inbox/search?query=${searchQuery}`,
+          `http://localhost:4000/inbox/search?query=${searchQuery}`,
           {
             credentials: "include",
           }
@@ -34,7 +34,7 @@ const SearchUserTab = ({ setSearchUserTabOpen }) => {
 
   const createConversation = async (participant_id, name, avatar) => {
     try {
-      const response = await fetch("https://chatterbox-9gu6.onrender.com/inbox/conversation", {
+      const response = await fetch("http://localhost:4000/inbox/conversation", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -85,7 +85,7 @@ const SearchUserTab = ({ setSearchUserTabOpen }) => {
                 {user.avatar ? (
                   <img
                     className="w-8 h-8"
-                    src={`https://chatterbox-9gu6.onrender.com/uploads/avatars/${user.avatar}`}
+                    src={`http://localhost:4000/uploads/avatars/${user.avatar}`}
                   />
                 ) : (
                   <SquareUserRound className="w-8 h-8" />

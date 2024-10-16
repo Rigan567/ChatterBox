@@ -5,7 +5,7 @@ function Users({ loggedInUser }) {
   const [users, setUsers] = useState([]);
   const fetchedUsers = async () => {
     try {
-      const signedUpUsers = await fetch("https://chatterbox-9gu6.onrender.com/users", {
+      const signedUpUsers = await fetch("http://localhost:4000/users", {
         credentials: "include", // Ensure cookies are sent for auth
       });
 
@@ -59,7 +59,7 @@ function Users({ loggedInUser }) {
                   <div className="w-full flex items-center">
                     <div className="px-1">
                       <img
-                        src={`https://chatterbox-9gu6.onrender.com/uploads/avatars/${item.avatar}`}
+                        src={`http://localhost:4000/uploads/avatars/${item.avatar}`}
                         className="z-10 w-8 h-8 object-cover rounded-full"
                         alt={`${item.name}'s avatar`}
                       />

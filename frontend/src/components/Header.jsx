@@ -10,7 +10,7 @@ export default function Header({ loggedInUser, setIsLoggedIn, isLoggedIn }) {
   // Handle Logout
   const handleLogout = async () => {
     try {
-      const response = await fetch("https://chatterbox-9gu6.onrender.com/logout", {
+      const response = await fetch("http://localhost:4000/logout", {
         method: "POST",
         credentials: "include", // Ensure cookies are included
       });
@@ -24,7 +24,7 @@ export default function Header({ loggedInUser, setIsLoggedIn, isLoggedIn }) {
 
   const removeUser = async (userid) => {
     try {
-      const response = await fetch(`https://chatterbox-9gu6.onrender.com/users/${userid}`, {
+      const response = await fetch(`http://localhost:4000/users/${userid}`, {
         method: "DELETE",
         credentials: "include",
       });
@@ -81,7 +81,7 @@ export default function Header({ loggedInUser, setIsLoggedIn, isLoggedIn }) {
                 className="border rounded-lg h-9 object-cover"
                 src={
                   loggedInUser.avatar
-                    ? `https://chatterbox-9gu6.onrender.com/uploads/avatars/${loggedInUser.avatar}`
+                    ? `http://localhost:4000/uploads/avatars/${loggedInUser.avatar}`
                     : null
                 }
                 alt=""

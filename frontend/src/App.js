@@ -14,7 +14,7 @@ export default function App() {
   useEffect(() => {
     const checkLoginStatus = async () => {
       try {
-        const response = await fetch("https://chatterbox-9gu6.onrender.com/check-login", {
+        const response = await fetch("http://localhost:4000/check-login", {
           credentials: "include", // Include cookies for authentication
         });
         if (response.ok) {

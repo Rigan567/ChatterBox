@@ -28,7 +28,7 @@ export default function Signup() {
     }
 
     try {
-      let response = await fetch("https://chatterbox-9gu6.onrender.com/users", {
+      let response = await fetch("http://localhost:4000/users", {
         method: "POST",
         body: formData,
         credentials: "include",
