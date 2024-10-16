@@ -21,18 +21,34 @@ const {
 
 dotenv.config();
 
+const allowedOrigins = [process.env.FRONTEND_URL];
+
 const app = express();
+
 app.use(
   cors({
-    origin: "https://chatter-box-chi-three.vercel.app/",
+    origin: function (origin, callback) {
+      if (!origin || allowedOrigins.indexOf(origin) !== -1) {
+        callback(null, true);
+      } else {
+        callback(new Error("Not allowed by CORS"));
+      }
+    },
     credentials: true,
+    optionsSuccessStatus: 200,
   })
 );
 
 const server = createServer(app);
 const io = new Server(server, {
   cors: {
-    origin: "https://chatter-box-chi-three.vercel.app/", // Allow requests from your frontend
+    origin: function (origin, callback) {
+      if (!origin || allowedOrigins.indexOf(origin) !== -1) {
+        callback(null, true);
+      } else {
+        callback(new Error("Not allowed by CORS"));
+      }
+    },
     methods: ["GET", "POST"],
     credentials: true,
   },

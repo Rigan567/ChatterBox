@@ -16,7 +16,11 @@ export default function App() {
     const checkLoginStatus = async () => {
       try {
         const response = await fetch(`${apiUrl}/check-login`, {
+          method: "GET",
           credentials: "include", // Include cookies for authentication
+          headers: {
+            "Content-Type": "application/json",
+          },
         });
         if (response.ok) {
           const { loggedIn, loggedInUser } = await response.json();
