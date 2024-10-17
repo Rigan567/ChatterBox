@@ -53,9 +53,11 @@ app.use((req, res, next) => {
 
 app.locals.moment = moment;
 
+const mongoURI = process.env.MONGODB_URI || process.env.MONGO_CONNECTION_STRING;
+
 //db connection
 mongoose
-  .connect(process.env.MONGO_CONNECTION_STRING)
+  .connect(mongoURI)
   .then(() => {
     console.log(
       `DB connected successfully on ${process.env.MONGO_CONNECTION_STRING} `
