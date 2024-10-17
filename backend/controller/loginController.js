@@ -28,7 +28,7 @@ const login = async (req, res) => {
 
         //generate cookie
         res.cookie(process.env.COOKIE_NAME, token, {
-          maxAge: process.env.JWT_EXPIRY,
+          maxAge: parseInt(process.env.JWT_EXPIRY) * 1000,
           httpOnly: true,
           secure: process.env.NODE_ENV === "production", // Use secure in production
           sameSite: "none", // Important for cross-site requests
