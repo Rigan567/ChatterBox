@@ -23,9 +23,10 @@ export default function App() {
           },
         });
         if (response.ok) {
-          const { loggedIn, loggedInUser } = await response.json();
-          setIsLoggedIn(loggedIn); // Assumes backend sends { loggedIn: true/false }
-          setLoggedInUser(loggedInUser);
+          const data = await response.json();
+
+          setIsLoggedIn(data.loggedIn); // Assumes backend sends { loggedIn: true/false }
+          setLoggedInUser(data.loggedInUser);
         } else {
           setIsLoggedIn(false);
           setLoggedInUser(null);

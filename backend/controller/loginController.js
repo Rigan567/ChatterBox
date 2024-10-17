@@ -1,12 +1,6 @@
 const User = require("../models/People");
 const bcrypt = require("bcryptjs");
-// const { cookie } = require("express-validator");
-const createError = require("http-errors");
 const jwt = require("jsonwebtoken");
-
-// const getLogin = (req, res, next) => {
-//   res.render("index");
-// };
 
 const login = async (req, res) => {
   try {
@@ -29,7 +23,7 @@ const login = async (req, res) => {
         };
         //generate token
         const token = jwt.sign(userObject, process.env.JWT_SECRET, {
-          expiresIn: process.env.JWT_EXPIRY,
+          expiresIn: process.env.JWT_EXPIRY || "1h",
         });
 
         //generate cookie

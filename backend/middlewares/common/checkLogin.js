@@ -5,9 +5,9 @@ const checkLogin = (req, res, next) => {
   const cookies =
     Object.keys(req.signedCookies).length > 0 ? req.signedCookies : null;
 
-  if (cookies) {
+  if (cookies && cookies[process.env.COOKIE_NAME]) {
     try {
-      token = cookies[process.env.COOKIE_NAME];
+      const token = cookies[process.env.COOKIE_NAME];
       const decoded = jwt.verify(token, process.env.JWT_SECRET);
       req.user = decoded;
 
@@ -22,46 +22,4 @@ const checkLogin = (req, res, next) => {
   }
 };
 
-// const redirectLoggedIn = (req, res, next) => {
-//   const token = req.signedCookies[process.env.COOKIE_NAME];
-//   console.log(token);
-
-//   if (token) {
-//     try {
-//       const decoded = jwt.verify(token, process.env.JWT_SECRET);
-
-//       if (decoded) {
-//         return res.redirect("/inbox");
-//       }
-//     } catch (error) {
-//       // If there's an error verifying the token, clear the cookie
-//       res.clearCookie(process.env.COOKIE_NAME);
-//       console.log("Error verifying token:", error);
-//     }
-//   }
-//   next();
-// };
-
-const requireRole = (role) => {
-  return (req, res, next) => {
-    if (req.user.role && role.includes(req.user.role)) {
-      next();
-    } else {
-      if (res.locals.html) {
-        next(
-          createHttpError(401, "You are not authorized to access this page")
-        );
-      } else {
-        res.status(401).json({
-          errors: {
-            common: {
-              msg: "You are not authorized to access this page",
-            },
-          },
-        });
-      }
-    }
-  };
-};
-
-module.exports = { checkLogin, requireRole };
+module.exports = { checkLogin };
