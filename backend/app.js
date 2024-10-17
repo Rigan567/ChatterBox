@@ -23,8 +23,19 @@ dotenv.config();
 
 const app = express();
 
+const allowedOrigins = [
+  "https://chatter-box-chi-three.vercel.app",
+  "https://chatter-1iwp0jyjh-rigans-projects-12fb309f.vercel.app",
+];
+
 const corsOptions = {
-  origin: "https://chatter-box-chi-three.vercel.app",
+  origin: function (origin, callback) {
+    if (!origin || allowedOrigins.indexOf(origin) !== -1) {
+      callback(null, true);
+    } else {
+      callback(new Error("Not allowed by CORS"));
+    }
+  },
   methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
   allowedHeaders: ["Content-Type", "Authorization"],
   credentials: true,
@@ -36,7 +47,13 @@ app.use(cors(corsOptions));
 const server = createServer(app);
 const io = new Server(server, {
   cors: {
-    origin: "https://chatter-box-chi-three.vercel.app", // Allow requests from your frontend
+    origin: function (origin, callback) {
+      if (!origin || allowedOrigins.indexOf(origin) !== -1) {
+        callback(null, true);
+      } else {
+        callback(new Error("Not allowed by CORS"));
+      }
+    },
     methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
     credentials: true,
   },
