@@ -28,6 +28,8 @@ export default function App() {
           setIsLoggedIn(data.loggedIn); // Assumes backend sends { loggedIn: true/false }
           setLoggedInUser(data.loggedInUser);
         } else {
+          const errorData = await response.json();
+          console.error("Login check failed:", errorData.error);
           setIsLoggedIn(false);
           setLoggedInUser(null);
         }

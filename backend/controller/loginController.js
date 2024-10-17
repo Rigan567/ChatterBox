@@ -30,6 +30,8 @@ const login = async (req, res) => {
         res.cookie(process.env.COOKIE_NAME, token, {
           maxAge: process.env.JWT_EXPIRY,
           httpOnly: true,
+          secure: process.env.NODE_ENV === "production", // Use secure in production
+          sameSite: "none", // Important for cross-site requests
           signed: true,
         });
 
@@ -46,9 +48,12 @@ const login = async (req, res) => {
 };
 
 const logout = (req, res) => {
-  // clear cookie
-  res.clearCookie(process.env.COOKIE_NAME);
-  res.json({ message: "logged out" });
+  res.clearCookie(process.env.COOKIE_NAME, {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === "production",
+    sameSite: "none",
+  });
+  res.json({ message: "Logged out successfully" });
 };
 
 module.exports = {
