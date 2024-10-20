@@ -287,15 +287,17 @@ export default function Inbox({ loggedInUser }) {
                   onClick={() => getMessages(conv._id, conv.creator.name)}
                 >
                   <div className="flex items-center space-x-3">
-                    <img
-                      className="w-10 h-10 rounded-full object-cover"
-                      src={
-                        conv?.creator?.avatar
-                          ? `${apiUrl}/uploads/avatars/${conv.creator.avatar}`
-                          : noPhoto
-                      }
-                      alt={`${conv.creator?.name}'s avatar`}
-                    />
+                    {conv.creator && (
+                      <img
+                        className="w-10 h-10 rounded-full object-cover"
+                        src={
+                          conv?.creator?.avatar
+                            ? `${apiUrl}/uploads/avatars/${conv.creator.avatar}`
+                            : noPhoto
+                        }
+                        alt={`${conv.creator?.name}'s avatar`}
+                      />
+                    )}
                     <div>
                       <h4 className="text-white font-semibold">
                         {conv.creator?.name}
