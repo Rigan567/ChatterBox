@@ -118,6 +118,11 @@ export default function Inbox({ loggedInUser }) {
     }
   };
 
+  const handleFileChange = (e) => {
+    const files = Array.from(e.target.files);
+    setSelectedFiles((prevFiles) => [...prevFiles, ...files]);
+  };
+
   const onSubmit = async (data) => {
     const formData = new FormData();
     formData.append("message", data.message);
@@ -362,9 +367,7 @@ export default function Inbox({ loggedInUser }) {
                     type="file"
                     multiple
                     className="hidden"
-                    onChange={(e) =>
-                      setSelectedFiles(Array.from(e.target.files))
-                    }
+                    onChange={handleFileChange}
                   />
                 </motion.label>
                 <input
