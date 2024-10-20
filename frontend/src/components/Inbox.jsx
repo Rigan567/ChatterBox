@@ -165,7 +165,7 @@ export default function Inbox({ loggedInUser }) {
           });
         }
 
-        setMessages("");
+        setMessages((prevMessages) => [...prevMessages, newMessage]);
         reset();
         setSelectedFiles([]);
       } else {
@@ -248,35 +248,65 @@ export default function Inbox({ loggedInUser }) {
 
         <div className="flex-1 overflow-y-auto space-y-2">
           {conversation.length > 0 ? (
-            conversation.map((conv) => (
-              <motion.div
-                key={conv._id}
-                whileHover={{ scale: 1.02 }}
-                whileTap={{ scale: 0.98 }}
-                className="bg-black/10 p-3 rounded-lg cursor-pointer hover:bg-black/20 transition-colors duration-200"
-                onClick={() => getMessages(conv._id, conv.participant.name)}
-              >
-                <div className="flex items-center space-x-3">
-                  <img
-                    className="w-10 h-10 rounded-full object-cover"
-                    src={
-                      conv.participant.avatar
-                        ? `${apiUrl}/uploads/avatars/${conv.participant.avatar}`
-                        : noPhoto
-                    }
-                    alt={`${conv.participant.name}'s avatar`}
-                  />
-                  <div>
-                    <h4 className="text-white font-semibold">
-                      {conv.participant.name}
-                    </h4>
-                    <p className="text-gray-300 text-sm">
-                      {moment(conv.createdAt).fromNow()}
-                    </p>
+            conversation.map((conv) =>
+              loggedInUser.userid !== conv.participant.id ? (
+                <motion.div
+                  key={conv._id}
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
+                  className="bg-black/10 p-3 rounded-lg cursor-pointer hover:bg-black/20 transition-colors duration-200"
+                  onClick={() => getMessages(conv._id, conv.participant.name)}
+                >
+                  <div className="flex items-center space-x-3">
+                    <img
+                      className="w-10 h-10 rounded-full object-cover"
+                      src={
+                        conv.participant.avatar
+                          ? `${apiUrl}/uploads/avatars/${conv.participant.avatar}`
+                          : noPhoto
+                      }
+                      alt={`${conv.participant.name}'s avatar`}
+                    />
+                    <div>
+                      <h4 className="text-white font-semibold">
+                        {conv.participant.name}
+                      </h4>
+                      <p className="text-gray-300 text-sm">
+                        {moment(conv.createdAt).fromNow()}
+                      </p>
+                    </div>
                   </div>
-                </div>
-              </motion.div>
-            ))
+                </motion.div>
+              ) : (
+                <motion.div
+                  key={conv._id}
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
+                  className="bg-black/10 p-3 rounded-lg cursor-pointer hover:bg-black/20 transition-colors duration-200"
+                  onClick={() => getMessages(conv._id, conv.creator.name)}
+                >
+                  <div className="flex items-center space-x-3">
+                    <img
+                      className="w-10 h-10 rounded-full object-cover"
+                      src={
+                        conv.creator.avatar
+                          ? `${apiUrl}/uploads/avatars/${conv.creator.avatar}`
+                          : noPhoto
+                      }
+                      alt={`${conv.creator.name}'s avatar`}
+                    />
+                    <div>
+                      <h4 className="text-white font-semibold">
+                        {conv.creator.name}
+                      </h4>
+                      <p className="text-gray-300 text-sm">
+                        {moment(conv.createdAt).fromNow()}
+                      </p>
+                    </div>
+                  </div>
+                </motion.div>
+              )
+            )
           ) : (
             <p className="text-center text-gray-400">No conversations yet.</p>
           )}
