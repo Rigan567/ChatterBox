@@ -284,7 +284,7 @@ export default function Inbox({ loggedInUser }) {
                   whileHover={{ scale: 1.02 }}
                   whileTap={{ scale: 0.98 }}
                   className="bg-black/10 p-3 rounded-lg cursor-pointer hover:bg-black/20 transition-colors duration-200"
-                  onClick={() => getMessages(conv._id, conv.participant.name)}
+                  onClick={() => getMessages(conv._id, conv.creator.name)}
                 >
                   <div className="flex items-center space-x-3">
                     <img
