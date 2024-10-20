@@ -20,7 +20,6 @@ import { apiUrl } from "../config";
 export default function Inbox({ loggedInUser }) {
   const [searchUserTabOpen, setSearchUserTabOpen] = useState(false);
   const [conversation, setConversation] = useState([]);
-  const [currentConversation, setCurrentConversation] = useState(null);
   const [participant, setParticipant] = useState(null);
   const [creator, setCreator] = useState(null);
   const [messages, setMessages] = useState([]);
@@ -105,9 +104,8 @@ export default function Inbox({ loggedInUser }) {
       if (!result.errors && result.data) {
         setFormVisible(true);
         const { data } = result;
-        setCurrentConversation(data.currentConversation);
-        setParticipant(data.currentConversation.participant);
-        setCreator(data.currentConversation.creator);
+        setParticipant(data.participant);
+        setCreator(data.creator);
         setCurrentConversationId(conversation_id);
         setCurrentConversationName(conversation_name);
         setMessages(
@@ -253,28 +251,34 @@ export default function Inbox({ loggedInUser }) {
 
         <div className="flex-1 overflow-y-auto space-y-2">
           {conversation.length > 0 ? (
-            conversation.map((conv) =>
-              loggedInUser.userid !== conv.participant.id ? (
+            conversation.map((conv) => {
+              const isLoggedInUserAndParticipantSame =
+                loggedInUser.userid === conv.participant.id;
+              const displayUser = isLoggedInUserAndParticipantSame
+                ? conv.creator
+                : conv.participant;
+
+              return (
                 <motion.div
                   key={conv._id}
                   whileHover={{ scale: 1.02 }}
                   whileTap={{ scale: 0.98 }}
                   className="bg-black/10 p-3 rounded-lg cursor-pointer hover:bg-black/20 transition-colors duration-200"
-                  onClick={() => getMessages(conv._id, conv.participant.name)}
+                  onClick={() => getMessages(conv._id, displayUser.name)}
                 >
                   <div className="flex items-center space-x-3">
                     <img
                       className="w-10 h-10 rounded-full object-cover"
                       src={
-                        conv?.participant?.avatar
-                          ? `${apiUrl}/uploads/avatars/${conv.participant.avatar}`
+                        displayUser?.avatar
+                          ? `${apiUrl}/uploads/avatars/${displayUser.avatar}`
                           : noPhoto
                       }
-                      alt={`${conv.participant.name}'s avatar`}
+                      alt={`${displayUser.name}'s avatar`}
                     />
                     <div>
                       <h4 className="text-white font-semibold">
-                        {conv.participant.name}
+                        {displayUser.name}
                       </h4>
                       <p className="text-gray-300 text-sm">
                         {moment(conv.createdAt).fromNow()}
@@ -282,38 +286,8 @@ export default function Inbox({ loggedInUser }) {
                     </div>
                   </div>
                 </motion.div>
-              ) : (
-                <motion.div
-                  key={conv._id}
-                  whileHover={{ scale: 1.02 }}
-                  whileTap={{ scale: 0.98 }}
-                  className="bg-black/10 p-3 rounded-lg cursor-pointer hover:bg-black/20 transition-colors duration-200"
-                  onClick={() => getMessages(conv._id, conv.creator.name)}
-                >
-                  <div className="flex items-center space-x-3">
-                    {conv.creator && (
-                      <img
-                        className="w-10 h-10 rounded-full object-cover"
-                        src={
-                          conv?.creator?.avatar
-                            ? `${apiUrl}/uploads/avatars/${conv.creator.avatar}`
-                            : noPhoto
-                        }
-                        alt={`${conv.creator?.name}'s avatar`}
-                      />
-                    )}
-                    <div>
-                      <h4 className="text-white font-semibold">
-                        {conv.creator?.name}
-                      </h4>
-                      <p className="text-gray-300 text-sm">
-                        {moment(conv.createdAt).fromNow()}
-                      </p>
-                    </div>
-                  </div>
-                </motion.div>
-              )
-            )
+              );
+            })
           ) : (
             <p className="text-center text-gray-400">No conversations yet.</p>
           )}
@@ -325,28 +299,16 @@ export default function Inbox({ loggedInUser }) {
           <>
             <div className="flex justify-between items-center px-6 py-4 bg-black/20">
               <div className="flex items-center space-x-3">
-                {currentConversation.creator.id !== loggedInUser.userid ? (
-                  <img
-                    src={
-                      creator.avatar
-                        ? `${apiUrl}/uploads/avatars/${creator.avatar}`
-                        : noPhoto
-                    }
-                    alt={creator.name}
-                    className="w-10 h-10 rounded-full object-cover"
-                  />
-                ) : (
-                  <img
-                    src={
-                      participant.avatar
-                        ? `${apiUrl}/uploads/avatars/${participant.avatar}`
-                        : noPhoto
-                    }
-                    alt={participant.name}
-                    className="w-10 h-10 rounded-full object-cover"
-                  />
-                )}
-
+                <img
+                  src={
+                    displayUser?.avatar
+                      ? `${apiUrl}/uploads/avatars/${displayUser.avatar}`
+                      : noPhoto
+                  }
+                  alt={displayUser?.name || "User"}
+                  className="w-10 h-10 rounded-full object-cover"
+                />
+                )
                 <h3 className="text-white text-lg font-semibold">
                   {currentConversationName}
                 </h3>

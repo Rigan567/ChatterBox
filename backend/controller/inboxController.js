@@ -168,14 +168,15 @@ const getMessages = async (req, res, next) => {
       conversation_id: req.params.conversation_id,
     });
 
-    const currentConversation = await Conversation.findById(
+    const { creator, participant } = await Conversation.findById(
       req.params.conversation_id
     );
 
     res.status(200).json({
       data: {
         messages: messages,
-        currentConversation,
+        participant,
+        creator,
       },
     });
   } catch (err) {
