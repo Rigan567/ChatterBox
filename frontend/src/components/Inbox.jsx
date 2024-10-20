@@ -315,11 +315,11 @@ export default function Inbox({ loggedInUser }) {
                 {displayUser && (
                   <img
                     src={
-                      displayUser?.avatar
+                      displayUser.avatar
                         ? `${apiUrl}/uploads/avatars/${displayUser.avatar}`
                         : noPhoto
                     }
-                    alt={displayUser?.name || "User"}
+                    alt={displayUser.name || "User"}
                     className="w-10 h-10 rounded-full object-cover"
                   />
                 )}
