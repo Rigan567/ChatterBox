@@ -261,7 +261,7 @@ export default function Inbox({ loggedInUser }) {
                     <img
                       className="w-10 h-10 rounded-full object-cover"
                       src={
-                        conv.participant.avatar
+                        conv?.participant?.avatar
                           ? `${apiUrl}/uploads/avatars/${conv.participant.avatar}`
                           : noPhoto
                       }
@@ -289,7 +289,7 @@ export default function Inbox({ loggedInUser }) {
                     <img
                       className="w-10 h-10 rounded-full object-cover"
                       src={
-                        conv.creator.avatar
+                        conv?.creator?.avatar
                           ? `${apiUrl}/uploads/avatars/${conv.creator.avatar}`
                           : noPhoto
                       }
