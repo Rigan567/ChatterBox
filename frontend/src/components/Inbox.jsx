@@ -126,7 +126,9 @@ export default function Inbox({ loggedInUser }) {
   const onSubmit = async (data) => {
     const formData = new FormData();
     formData.append("message", data.message);
-    selectedFiles.forEach((file) => formData.append("files", file));
+    if (selectedFiles) {
+      selectedFiles.forEach((file) => formData.append("files", file));
+    }
     formData.append("receiverId", participant.id);
     formData.append("receiverName", participant.name);
     formData.append("receiverAvatar", participant.avatar || "");
@@ -163,7 +165,7 @@ export default function Inbox({ loggedInUser }) {
           });
         }
 
-        setMessages((prevMessages) => [...prevMessages, newMessage]);
+        setMessages("");
         reset();
         setSelectedFiles([]);
       } else {
@@ -310,46 +312,61 @@ export default function Inbox({ loggedInUser }) {
                 <Trash2 size={20} />
               </motion.button>
             </div>
-
+            {/* Message Container */}
             <div
               ref={messageContainerRef}
               className="flex-1 overflow-y-auto p-6 space-y-4"
             >
               {messages.length > 0 ? (
-                messages.map((message, index) => (
-                  <motion.div
-                    key={message.id || index}
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.3 }}
-                    className={`flex ${
-                      message.isCurrentUser ? "justify-end" : "justify-start"
-                    }`}
-                  >
-                    <div
-                      className={`max-w-xs lg:max-w-md xl:max-w-lg ${
-                        message.isCurrentUser ? "bg-purple-600" : "bg-gray-700"
-                      } rounded-lg px-4 py-2 shadow-md`}
+                messages.map((message, index) => {
+                  const sender = message.sender || {};
+                  const senderAvatar = sender.avatar
+                    ? `${apiUrl}/uploads/avatars/${sender.avatar}`
+                    : `${noPhoto}`;
+                  const isCurrentUser = sender.id === loggedInUser.userid;
+                  return (
+                    <motion.div
+                      key={message.id || index}
+                      initial={{ opacity: 0, y: 20 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ duration: 0.3 }}
+                      className={`flex ${
+                        isCurrentUser ? "justify-end" : "justify-start"
+                      }`}
                     >
-                      <p className="text-white">{message.text}</p>
-                      {message.attachment && message.attachment.length > 0 && (
-                        <div className="mt-2 flex flex-wrap gap-2">
-                          {message.attachment.map((attachment, idx) => (
-                            <img
-                              key={idx}
-                              src={`${apiUrl}/uploads/attachments/${attachment}`}
-                              alt="attachment"
-                              className="w-16 h-16 object-cover rounded-md"
-                            />
-                          ))}
-                        </div>
+                      {!isCurrentUser && sender.name && (
+                        <img
+                          src={senderAvatar}
+                          alt={sender.name}
+                          className="w-8 h-8 rounded-full"
+                        />
                       )}
-                      <p className="text-xs text-gray-300 mt-1">
-                        {message.time}
-                      </p>
-                    </div>
-                  </motion.div>
-                ))
+                      <div
+                        className={`max-w-xs lg:max-w-md xl:max-w-lg ${
+                          isCurrentUser ? "bg-purple-600" : "bg-gray-700"
+                        } rounded-lg px-4 py-2 shadow-md`}
+                      >
+                        <p className="text-white">{message.text}</p>
+                        {message.attachment &&
+                          message.attachment.length > 0 && (
+                            <div className="mt-2 flex flex-wrap gap-2">
+                              {message.attachment.map((attachment, idx) => (
+                                <img
+                                  key={idx}
+                                  src={`${apiUrl}/uploads/attachments/${attachment}`}
+                                  alt="attachment"
+                                  className="w-16 h-16 object-cover rounded-md"
+                                />
+                              ))}
+                            </div>
+                          )}
+                        <p className="text-xs text-gray-300 mt-1">
+                          {moment(message.date_time).fromNow()}
+                        </p>
+                      </div>
+                    </motion.div>
+                  );
+                })
               ) : (
                 <p className="text-center text-gray-400">No messages yet</p>
               )}
