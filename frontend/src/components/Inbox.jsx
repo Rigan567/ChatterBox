@@ -30,7 +30,20 @@ export default function Inbox({ loggedInUser }) {
   const [socket, setSocket] = useState(null);
   const messageContainerRef = useRef(null);
   const { register, handleSubmit, reset, watch } = useForm();
+  const [displayUser, setDisplayUser] = useState(null);
 
+  useEffect(() => {
+    if (conversation.length > 0 && currentConversationId) {
+      const conv = conversation.find((c) => c._id === currentConversationId);
+      if (conv) {
+        const isLoggedInUserAndParticipantSame =
+          loggedInUser.userid === conv.participant.id;
+        setDisplayUser(
+          isLoggedInUserAndParticipantSame ? conv.creator : conv.participant
+        );
+      }
+    }
+  }, [conversation, currentConversationId, loggedInUser.userid]);
   useEffect(() => {
     const newSocket = io(`${apiUrl}/`, { withCredentials: true });
     newSocket.on("connect", () => setSocket(newSocket));
@@ -254,7 +267,7 @@ export default function Inbox({ loggedInUser }) {
             conversation.map((conv) => {
               const isLoggedInUserAndParticipantSame =
                 loggedInUser.userid === conv.participant.id;
-              const displayUser = isLoggedInUserAndParticipantSame
+              const convDisplayUser = isLoggedInUserAndParticipantSame
                 ? conv.creator
                 : conv.participant;
 
@@ -264,21 +277,21 @@ export default function Inbox({ loggedInUser }) {
                   whileHover={{ scale: 1.02 }}
                   whileTap={{ scale: 0.98 }}
                   className="bg-black/10 p-3 rounded-lg cursor-pointer hover:bg-black/20 transition-colors duration-200"
-                  onClick={() => getMessages(conv._id, displayUser.name)}
+                  onClick={() => getMessages(conv._id, convDisplayUser.name)}
                 >
                   <div className="flex items-center space-x-3">
                     <img
                       className="w-10 h-10 rounded-full object-cover"
                       src={
-                        displayUser?.avatar
-                          ? `${apiUrl}/uploads/avatars/${displayUser.avatar}`
+                        convDisplayUser?.avatar
+                          ? `${apiUrl}/uploads/avatars/${convDisplayUser.avatar}`
                           : noPhoto
                       }
-                      alt={`${displayUser.name}'s avatar`}
+                      alt={`${convDisplayUser.name}'s avatar`}
                     />
                     <div>
                       <h4 className="text-white font-semibold">
-                        {displayUser.name}
+                        {convDisplayUser.name}
                       </h4>
                       <p className="text-gray-300 text-sm">
                         {moment(conv.createdAt).fromNow()}
@@ -299,16 +312,18 @@ export default function Inbox({ loggedInUser }) {
           <>
             <div className="flex justify-between items-center px-6 py-4 bg-black/20">
               <div className="flex items-center space-x-3">
-                <img
-                  src={
-                    displayUser?.avatar
-                      ? `${apiUrl}/uploads/avatars/${displayUser.avatar}`
-                      : noPhoto
-                  }
-                  alt={displayUser?.name || "User"}
-                  className="w-10 h-10 rounded-full object-cover"
-                />
-                )
+                {displayUser && (
+                  <img
+                    src={
+                      displayUser?.avatar
+                        ? `${apiUrl}/uploads/avatars/${displayUser.avatar}`
+                        : noPhoto
+                    }
+                    alt={displayUser?.name || "User"}
+                    className="w-10 h-10 rounded-full object-cover"
+                  />
+                )}
+
                 <h3 className="text-white text-lg font-semibold">
                   {currentConversationName}
                 </h3>
