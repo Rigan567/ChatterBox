@@ -28,7 +28,7 @@ export default function Inbox({ loggedInUser }) {
   const [selectedFiles, setSelectedFiles] = useState([]);
   const [socket, setSocket] = useState(null);
   const messageContainerRef = useRef(null);
-  const { register, handleSubmit, reset } = useForm();
+  const { register, handleSubmit, reset, watch } = useForm();
 
   useEffect(() => {
     const newSocket = io(`${apiUrl}/`, { withCredentials: true });
@@ -163,9 +163,10 @@ export default function Inbox({ loggedInUser }) {
               conversation_id: currentConversationId,
             },
           });
+        } else {
+          setMessages((prevMessages) => [...prevMessages, newMessage]);
         }
 
-        setMessages((prevMessages) => [...prevMessages, newMessage]);
         reset();
         setSelectedFiles([]);
       } else {
@@ -283,7 +284,7 @@ export default function Inbox({ loggedInUser }) {
                   whileHover={{ scale: 1.02 }}
                   whileTap={{ scale: 0.98 }}
                   className="bg-black/10 p-3 rounded-lg cursor-pointer hover:bg-black/20 transition-colors duration-200"
-                  onClick={() => getMessages(conv._id, conv.creator.name)}
+                  onClick={() => getMessages(conv._id, conv.participant.name)}
                 >
                   <div className="flex items-center space-x-3">
                     <img
@@ -293,11 +294,11 @@ export default function Inbox({ loggedInUser }) {
                           ? `${apiUrl}/uploads/avatars/${conv.creator.avatar}`
                           : noPhoto
                       }
-                      alt={`${conv.creator.name}'s avatar`}
+                      alt={`${conv.creator?.name}'s avatar`}
                     />
                     <div>
                       <h4 className="text-white font-semibold">
-                        {conv.creator.name}
+                        {conv.creator?.name}
                       </h4>
                       <p className="text-gray-300 text-sm">
                         {moment(conv.createdAt).fromNow()}
@@ -418,7 +419,9 @@ export default function Inbox({ loggedInUser }) {
                   />
                 </motion.label>
                 <input
-                  {...register("message", { required: true })}
+                  {...register("message", {
+                    required: selectedFiles.length === 0,
+                  })}
                   className="flex-1 bg-black/10 text-white rounded-full px-4 py-2 focus:outline-none focus:ring-2 focus:ring-purple-500"
                   placeholder="Type a message..."
                 />
@@ -426,7 +429,12 @@ export default function Inbox({ loggedInUser }) {
                   whileHover={{ scale: 1.1 }}
                   whileTap={{ scale: 0.9 }}
                   type="submit"
-                  className="bg-purple-600 text-white rounded-full p-2 hover:bg-purple-700 transition-colors duration-200"
+                  disabled={!selectedFiles.length && !watch("message")}
+                  className={`rounded-full p-2 transition-colors duration-200 ${
+                    !selectedFiles.length && !watch("message")
+                      ? "bg-gray-400 cursor-not-allowed"
+                      : "bg-purple-600 hover:bg-purple-700"
+                  }`}
                 >
                   <Send size={20} />
                 </motion.button>
