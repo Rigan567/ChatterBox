@@ -20,7 +20,9 @@ import { apiUrl } from "../config";
 export default function Inbox({ loggedInUser }) {
   const [searchUserTabOpen, setSearchUserTabOpen] = useState(false);
   const [conversation, setConversation] = useState([]);
+  const [currentConversation, setCurrentConversation] = useState(null);
   const [participant, setParticipant] = useState(null);
+  const [creator, setCreator] = useState(null);
   const [messages, setMessages] = useState([]);
   const [currentConversationName, setCurrentConversationName] = useState("");
   const [currentConversationId, setCurrentConversationId] = useState(null);
@@ -103,7 +105,9 @@ export default function Inbox({ loggedInUser }) {
       if (!result.errors && result.data) {
         setFormVisible(true);
         const { data } = result;
-        setParticipant(data.participant);
+        setCurrentConversation(data.currentConversation);
+        setParticipant(data.currentConversation.participant);
+        setCreator(data.currentConversation.creator);
         setCurrentConversationId(conversation_id);
         setCurrentConversationName(conversation_name);
         setMessages(
@@ -321,7 +325,17 @@ export default function Inbox({ loggedInUser }) {
           <>
             <div className="flex justify-between items-center px-6 py-4 bg-black/20">
               <div className="flex items-center space-x-3">
-                {participant && (
+                {currentConversation.creator.id !== loggedInUser.userid ? (
+                  <img
+                    src={
+                      creator.avatar
+                        ? `${apiUrl}/uploads/avatars/${creator.avatar}`
+                        : noPhoto
+                    }
+                    alt={creator.name}
+                    className="w-10 h-10 rounded-full object-cover"
+                  />
+                ) : (
                   <img
                     src={
                       participant.avatar
@@ -332,6 +346,7 @@ export default function Inbox({ loggedInUser }) {
                     className="w-10 h-10 rounded-full object-cover"
                   />
                 )}
+
                 <h3 className="text-white text-lg font-semibold">
                   {currentConversationName}
                 </h3>
