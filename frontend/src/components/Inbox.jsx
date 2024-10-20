@@ -1,5 +1,15 @@
-import { CirclePlus, Paperclip, Plus, Trash2, X } from "lucide-react";
 import React, { useEffect, useState, useRef } from "react";
+import { useForm } from "react-hook-form";
+import { motion, AnimatePresence } from "framer-motion";
+import {
+  CirclePlus,
+  Paperclip,
+  Plus,
+  Trash2,
+  X,
+  Search,
+  Send,
+} from "lucide-react";
 import SearchUserTab from "./SearchUserTab";
 import moment from "moment";
 import { toast } from "react-toastify";
@@ -7,7 +17,7 @@ import io from "socket.io-client";
 import noPhoto from "../assets/images/images.jpeg";
 import { apiUrl } from "../config";
 
-function Inbox({ loggedInUser }) {
+export default function Inbox({ loggedInUser }) {
   const [searchUserTabOpen, setSearchUserTabOpen] = useState(false);
   const [conversation, setConversation] = useState([]);
   const [participant, setParticipant] = useState(null);
@@ -15,42 +25,26 @@ function Inbox({ loggedInUser }) {
   const [currentConversationName, setCurrentConversationName] = useState("");
   const [currentConversationId, setCurrentConversationId] = useState(null);
   const [formVisible, setFormVisible] = useState(false);
-  const [messageText, setMessageText] = useState("");
   const [selectedFiles, setSelectedFiles] = useState([]);
   const [socket, setSocket] = useState(null);
-  const messageContainerRef = useRef(null); // Create a ref to the message container
+  const messageContainerRef = useRef(null);
+  const { register, handleSubmit, reset } = useForm();
 
   useEffect(() => {
-    const newSocket = io(`${apiUrl}/`, {
-      withCredentials: true,
-    });
-    newSocket.on("connect", () => {
-      // console.log("Connected to socket server");
-      setSocket(newSocket);
-    });
-
-    newSocket.on("connect_error", (error) => {
-      console.error("Socket connection error:", error);
-    });
-
+    const newSocket = io(`${apiUrl}/`, { withCredentials: true });
+    newSocket.on("connect", () => setSocket(newSocket));
+    newSocket.on("connect_error", (error) =>
+      console.error("Socket connection error:", error)
+    );
     return () => {
       if (newSocket) newSocket.disconnect();
     };
   }, []);
 
-  const scrollToBottom = () => {
-    if (messageContainerRef.current) {
-      messageContainerRef.current.scrollTop =
-        messageContainerRef.current.scrollHeight;
-    }
-  };
-
   useEffect(() => {
     if (socket) {
       socket.on("new_message", (data) => {
-        // console.log("Received new message:", data);
         setMessages((prevMessages) => {
-          // Check if the message is already in the list to avoid duplicates
           const messageExists = prevMessages.some(
             (msg) => msg.id === data.message._id
           );
@@ -69,17 +63,16 @@ function Inbox({ loggedInUser }) {
         });
       });
     }
-
     return () => {
-      if (socket) {
-        socket.off("new_message");
-      }
+      if (socket) socket.off("new_message");
     };
   }, [socket, loggedInUser.userid]);
 
-  // Scroll to the bottom whenever messages change
   useEffect(() => {
-    scrollToBottom();
+    if (messageContainerRef.current) {
+      messageContainerRef.current.scrollTop =
+        messageContainerRef.current.scrollHeight;
+    }
   }, [messages]);
 
   const fetchConversation = async () => {
@@ -87,43 +80,35 @@ function Inbox({ loggedInUser }) {
       const response = await fetch(`${apiUrl}/inbox`, {
         credentials: "include",
       });
-      if (!response.ok) {
+      if (!response.ok)
         throw new Error(`HTTP error! status: ${response.status}`);
-      }
       const result = await response.json();
       setConversation(result);
     } catch (error) {
       console.log(`Error Here Is: ${error}`);
     }
   };
+
   useEffect(() => {
     fetchConversation();
-  }, [conversation]);
+  }, []);
 
   const getMessages = async (conversation_id, conversation_name) => {
     try {
       const response = await fetch(
         `${apiUrl}/inbox/messages/${conversation_id}`,
-        {
-          credentials: "include",
-        }
+        { credentials: "include" }
       );
       const result = await response.json();
-      // console.log("Fetched Messages:", result);
-
       if (!result.errors && result.data) {
         setFormVisible(true);
         const { data } = result;
-
         setParticipant(data.participant);
         setCurrentConversationId(conversation_id);
         setCurrentConversationName(conversation_name);
-
-        if (data.messages && data.messages.length > 0) {
-          setMessages(data.messages);
-        } else {
-          setMessages([]);
-        }
+        setMessages(
+          data.messages && data.messages.length > 0 ? data.messages : []
+        );
       } else {
         toast.error("Error loading messages!");
       }
@@ -133,27 +118,15 @@ function Inbox({ loggedInUser }) {
     }
   };
 
-  const handleFileChange = (e) => {
-    const files = Array.from(e.target.files);
-    setSelectedFiles((prevFiles) => [...prevFiles, ...files]);
-  };
-  const removeFile = (index) => {
-    setSelectedFiles((prevFiles) => prevFiles.filter((_, i) => i !== index));
-  };
-
-  const sendMessages = async (e) => {
-    e.preventDefault();
+  const onSubmit = async (data) => {
     const formData = new FormData();
-    formData.append("message", messageText);
-    if (selectedFiles) {
-      selectedFiles.forEach((file) => {
-        formData.append("files", file);
-      });
-    }
+    formData.append("message", data.message);
+    selectedFiles.forEach((file) => formData.append("files", file));
     formData.append("receiverId", participant.id);
     formData.append("receiverName", participant.name);
     formData.append("receiverAvatar", participant.avatar || "");
     formData.append("conversationId", currentConversationId);
+
     try {
       const response = await fetch(`${apiUrl}/inbox/message`, {
         method: "POST",
@@ -163,10 +136,9 @@ function Inbox({ loggedInUser }) {
       const result = await response.json();
 
       if (!result.error) {
-        // Immediately add the message to the UI
         const newMessage = {
           id: result.data._id,
-          text: messageText,
+          text: data.message,
           sender: {
             id: loggedInUser.userid,
             name: loggedInUser.username,
@@ -177,7 +149,6 @@ function Inbox({ loggedInUser }) {
           isCurrentUser: true,
         };
 
-        // Emit the socket event
         if (socket) {
           socket.emit("new_message", {
             message: {
@@ -187,10 +158,9 @@ function Inbox({ loggedInUser }) {
           });
         }
 
-        // Reset the input fields
-        setMessageText("");
+        setMessages((prevMessages) => [...prevMessages, newMessage]);
+        reset();
         setSelectedFiles([]);
-        scrollToBottom();
       } else {
         toast.error(result.message || "Failed to send message.");
       }
@@ -216,6 +186,7 @@ function Inbox({ loggedInUser }) {
           `Conversation with ${participant.name} removed successfully!`
         );
         setCurrentConversationName(null);
+        fetchConversation();
       }
     } catch (error) {
       toast.error(error.msg);
@@ -223,238 +194,227 @@ function Inbox({ loggedInUser }) {
   };
 
   return (
-    <div className="mt-16 bg-white/30 backdrop-blur-md rounded-xl drop-shadow-md h-screen w-full  flex flex-1 hover:shadow-xl ">
-      <section className="relative bg-black/45 p-2 w-96 flex flex-col">
-        <div className=" p-4">
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      exit={{ opacity: 0, y: -20 }}
+      transition={{ duration: 0.3 }}
+      className="mt-16 bg-gradient-to-br from-purple-700 to-indigo-800 rounded-xl shadow-2xl h-[calc(100vh-4rem)] w-full flex overflow-hidden"
+    >
+      <section className="w-1/4 bg-black/20 p-4 flex flex-col">
+        <div className="relative mb-4">
+          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
           <input
             type="text"
             placeholder="Search Users"
-            className="p-1 px-2 pr-3 w-56 rounded-md outline-none font-mono bg-black/10 border-b  border-white/20 shadow-md hover:border-r-2 hover:border-b-2 text-white"
+            className="w-full pl-10 pr-4 py-2 bg-black/10 text-white placeholder-gray-400 rounded-full focus:outline-none focus:ring-2 focus:ring-purple-500"
           />
         </div>
 
-        <div
-          className="flex justify-center"
+        <motion.button
+          whileHover={{ scale: 1.05 }}
+          whileTap={{ scale: 0.95 }}
+          className="mb-4 flex items-center justify-center p-2 bg-purple-600 text-white rounded-full shadow-lg hover:bg-purple-700 transition-colors duration-200"
           onClick={() => setSearchUserTabOpen(!searchUserTabOpen)}
         >
-          {searchUserTabOpen ? (
-            <Plus className="rotate-45  h-8 w-8 cursor-pointer hover:fill-white border-none" />
+          {searchUserTabOpen ? <X size={24} /> : <Plus size={24} />}
+          <span className="ml-2">
+            {searchUserTabOpen ? "Close" : "New Chat"}
+          </span>
+        </motion.button>
+
+        <AnimatePresence>
+          {searchUserTabOpen && (
+            <motion.div
+              initial={{ opacity: 0, height: 0 }}
+              animate={{ opacity: 1, height: "auto" }}
+              exit={{ opacity: 0, height: 0 }}
+              transition={{ duration: 0.3 }}
+            >
+              <SearchUserTab
+                setSearchUserTabOpen={setSearchUserTabOpen}
+                apiUrl={apiUrl}
+              />
+            </motion.div>
+          )}
+        </AnimatePresence>
+
+        <div className="flex-1 overflow-y-auto space-y-2">
+          {conversation.length > 0 ? (
+            conversation.map((conv) => (
+              <motion.div
+                key={conv._id}
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
+                className="bg-black/10 p-3 rounded-lg cursor-pointer hover:bg-black/20 transition-colors duration-200"
+                onClick={() => getMessages(conv._id, conv.participant.name)}
+              >
+                <div className="flex items-center space-x-3">
+                  <img
+                    className="w-10 h-10 rounded-full object-cover"
+                    src={
+                      conv.participant.avatar
+                        ? `${apiUrl}/uploads/avatars/${conv.participant.avatar}`
+                        : noPhoto
+                    }
+                    alt={`${conv.participant.name}'s avatar`}
+                  />
+                  <div>
+                    <h4 className="text-white font-semibold">
+                      {conv.participant.name}
+                    </h4>
+                    <p className="text-gray-300 text-sm">
+                      {moment(conv.createdAt).fromNow()}
+                    </p>
+                  </div>
+                </div>
+              </motion.div>
+            ))
           ) : (
-            <CirclePlus className="h-8 w-8 cursor-pointer hover:fill-white border-none" />
+            <p className="text-center text-gray-400">No conversations yet.</p>
           )}
         </div>
-        {searchUserTabOpen ? (
-          <SearchUserTab
-            setSearchUserTabOpen={setSearchUserTabOpen}
-            apiUrl={apiUrl}
-          />
-        ) : (
-          ""
-        )}
-        {conversation.length > 0 ? (
-          conversation.map((conversation) =>
-            loggedInUser.userid !== conversation.participant.id ? (
-              <div
-                key={conversation._id}
-                className=" text-white/70  flex mt-2 rounded-lg bg-black/10 hover:bg-black/25 cursor-pointer transition-all shadow-md"
-                onClick={() =>
-                  getMessages(conversation._id, conversation.participant.name)
-                }
-              >
-                <div className="  flex items-center p-2 rounded-lg">
-                  <img
-                    className="w-10 h-10 "
-                    src={
-                      conversation?.participant?.avatar
-                        ? `${apiUrl}/uploads/avatars/${conversation.participant.avatar}`
-                        : "/default-avatar.png"
-                    } // Safe access to avatar
-                    alt={`${conversation.participant?.name || "User"}'s avatar`}
-                  />
-                </div>
-                <div className="px-2 flex flex-col justify-center">
-                  <h4>{conversation.participant?.name || "Unknown"}</h4>
-                  <p>{moment(conversation.createdAt).fromNow()}</p>
-                </div>
-              </div>
-            ) : (
-              <div
-                key={conversation._id}
-                className=" text-white/70  flex mt-2 rounded-lg bg-black/10 hover:bg-black/25 cursor-pointer transition-all shadow-md"
-                onClick={() =>
-                  getMessages(conversation._id, conversation.participant.name)
-                }
-              >
-                <div className="  flex items-center p-2 rounded-lg">
-                  <img
-                    className="w-10 h-10 "
-                    src={
-                      conversation?.creator?.avatar
-                        ? `${apiUrl}/uploads/avatars/${conversation.creator.avatar}`
-                        : "/default-avatar.png"
-                    } // Safe access to avatar
-                    alt={`${conversation.creator?.name || "User"}'s avatar`}
-                  />
-                </div>
-                <div className="px-2 flex flex-col justify-center">
-                  <h4>{conversation.creator?.name || "Unknown"}</h4>
-                  <p>{moment(conversation.createdAt).fromNow()}</p>
-                </div>
-              </div>
-            )
-          )
-        ) : (
-          <p>No conversations yet.</p>
-        )}
       </section>
-      <section className="relative w-full flex flex-col">
-        {/* name and trashcan placeholder */}
-        <div className=" flex justify-between px-5 py-4 bg-black/45">
-          <div className="flex gap-1 justify-center items-center">
-            {participant ? (
-              <img
-                src={
-                  participant.avatar
-                    ? `${apiUrl}/uploads/avatars/${participant.avatar}`
-                    : noPhoto
-                }
-                alt={participant?.name || "Unknown"}
-                className="w-8 h-8 object-contain rounded-lg"
-              />
-            ) : (
-              ""
-            )}
-            <h3 className="font-mono text-white text-lg">
-              {currentConversationName || "No Conversation Selected"}
-            </h3>
-          </div>
-          <p className="cursor-pointer">
-            <button onClick={() => removeConversation(participant.id)}>
-              <Trash2 className="hover:fill-red-600" />
-            </button>
-          </p>
-        </div>
-        {/* Message Container */}
-        <div
-          ref={messageContainerRef}
-          className="flex-1 overflow-y-auto p-4 space-y-4"
-        >
-          {messages.length > 0 ? (
-            // Render all messages
-            messages.map((message, index) => {
-              const sender = message.sender || {};
-              const senderAvatar = sender.avatar
-                ? `${apiUrl}/uploads/avatars/${sender.avatar}`
-                : `${noPhoto}`;
 
-              const isCurrentUser = sender.id === loggedInUser.userid;
-              const messageClass = isCurrentUser
-                ? "bg-blue-600 text-white self-end"
-                : "bg-gray-700 text-white self-start";
-
-              return (
-                <div
-                  key={message.id || index}
-                  className={`flex items-end space-x-2 ${
-                    isCurrentUser ? "justify-end" : "justify-start"
-                  }`}
-                >
-                  {!isCurrentUser && sender.name && (
-                    <img
-                      src={senderAvatar}
-                      alt={sender.name}
-                      className="w-8 h-8 rounded-full"
-                    />
-                  )}
-                  <div
-                    className={`max-w-xs break-words rounded-lg px-4 py-2 ${messageClass}`}
-                  >
-                    {message.text}
-
-                    {message.attachment && message.attachment.length > 0 && (
-                      <div className="mt-2 flex flex-wrap gap-2">
-                        {message.attachment.map((attachment, idx) => (
-                          <img
-                            key={idx}
-                            src={`${apiUrl}/uploads/attachments/${attachment}`}
-                            alt="attachment"
-                            className="w-16 h-16 object-cover rounded-md"
-                          />
-                        ))}
-                      </div>
-                    )}
-                    <div className="text-xs text-gray-400 mt-1">
-                      {moment(message.date_time).fromNow()}
-                    </div>
-                  </div>
-                </div>
-              );
-            })
-          ) : (
-            <div className="text-center text-gray-400">No messages yet</div>
-          )}
-        </div>
-
-        {/* Input Section */}
-        {formVisible ? (
-          <form
-            onSubmit={sendMessages}
-            className="border-t border-gray-700 p-4 flex items-center bg-gray-900"
-          >
-            {selectedFiles.length > 0 && (
-              <div className="flex flex-wrap gap-2 mb-2">
-                {selectedFiles.map((file, index) => (
-                  <div key={index} className="relative">
-                    <img
-                      src={URL.createObjectURL(file)}
-                      alt={`Preview ${index}`}
-                      className="w-16 h-16 object-cover rounded-md"
-                    />
-                    <button
-                      type="button"
-                      onClick={() => removeFile(index)}
-                      className="absolute -top-2 -right-2 bg-red-500 rounded-full p-1"
-                    >
-                      <X size={12} />
-                    </button>
-                  </div>
-                ))}
+      <section className="flex-1 flex flex-col bg-black/10">
+        {currentConversationName ? (
+          <>
+            <div className="flex justify-between items-center px-6 py-4 bg-black/20">
+              <div className="flex items-center space-x-3">
+                {participant && (
+                  <img
+                    src={
+                      participant.avatar
+                        ? `${apiUrl}/uploads/avatars/${participant.avatar}`
+                        : noPhoto
+                    }
+                    alt={participant.name}
+                    className="w-10 h-10 rounded-full object-cover"
+                  />
+                )}
+                <h3 className="text-white text-lg font-semibold">
+                  {currentConversationName}
+                </h3>
               </div>
-            )}
-            <div className="flex items-center">
-              <button
-                type="button"
-                className="relative  text-gray-400 hover:text-gray-200"
+              <motion.button
+                whileHover={{ scale: 1.1 }}
+                whileTap={{ scale: 0.9 }}
+                className="text-red-500 hover:text-red-600"
+                onClick={() => removeConversation(participant.id)}
               >
-                <input
-                  type="file"
-                  multiple
-                  className="absolute w-9 top-1 right-0 opacity-0 cursor-pointer"
-                  onChange={handleFileChange}
-                />
-                <Paperclip className=" w-9 h-9 bg-bg-gray-900 bottom-3  cursor-pointer" />
-              </button>
-              <input
-                type="text"
-                className="ml-4 flex-1 p-2 bg-gray-800 text-white rounded-lg outline-none border-none"
-                placeholder="Type a message"
-                value={messageText}
-                onChange={(e) => setMessageText(e.target.value)}
-              />
-              <button
-                type="submit"
-                className="ml-2 px-4 py-2 bg-blue-600 text-white rounded-lg"
-              >
-                Send
-              </button>
+                <Trash2 size={20} />
+              </motion.button>
             </div>
-          </form>
+
+            <div
+              ref={messageContainerRef}
+              className="flex-1 overflow-y-auto p-6 space-y-4"
+            >
+              {messages.length > 0 ? (
+                messages.map((message, index) => (
+                  <motion.div
+                    key={message.id || index}
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.3 }}
+                    className={`flex ${
+                      message.isCurrentUser ? "justify-end" : "justify-start"
+                    }`}
+                  >
+                    <div
+                      className={`max-w-xs lg:max-w-md xl:max-w-lg ${
+                        message.isCurrentUser ? "bg-purple-600" : "bg-gray-700"
+                      } rounded-lg px-4 py-2 shadow-md`}
+                    >
+                      <p className="text-white">{message.text}</p>
+                      {message.attachment && message.attachment.length > 0 && (
+                        <div className="mt-2 flex flex-wrap gap-2">
+                          {message.attachment.map((attachment, idx) => (
+                            <img
+                              key={idx}
+                              src={`${apiUrl}/uploads/attachments/${attachment}`}
+                              alt="attachment"
+                              className="w-16 h-16 object-cover rounded-md"
+                            />
+                          ))}
+                        </div>
+                      )}
+                      <p className="text-xs text-gray-300 mt-1">
+                        {message.time}
+                      </p>
+                    </div>
+                  </motion.div>
+                ))
+              ) : (
+                <p className="text-center text-gray-400">No messages yet</p>
+              )}
+            </div>
+
+            <form onSubmit={handleSubmit(onSubmit)} className="p-4 bg-black/20">
+              <div className="flex items-center space-x-2">
+                <motion.label
+                  whileHover={{ scale: 1.1 }}
+                  whileTap={{ scale: 0.9 }}
+                  className="cursor-pointer text-gray-400 hover:text-gray-200"
+                >
+                  <Paperclip size={20} />
+                  <input
+                    type="file"
+                    multiple
+                    className="hidden"
+                    onChange={(e) =>
+                      setSelectedFiles(Array.from(e.target.files))
+                    }
+                  />
+                </motion.label>
+                <input
+                  {...register("message", { required: true })}
+                  className="flex-1 bg-black/10 text-white rounded-full px-4 py-2 focus:outline-none focus:ring-2 focus:ring-purple-500"
+                  placeholder="Type a message..."
+                />
+                <motion.button
+                  whileHover={{ scale: 1.1 }}
+                  whileTap={{ scale: 0.9 }}
+                  type="submit"
+                  className="bg-purple-600 text-white rounded-full p-2 hover:bg-purple-700 transition-colors duration-200"
+                >
+                  <Send size={20} />
+                </motion.button>
+              </div>
+              {selectedFiles.length > 0 && (
+                <div className="mt-2 flex flex-wrap gap-2">
+                  {selectedFiles.map((file, index) => (
+                    <div key={index} className="relative">
+                      <img
+                        src={URL.createObjectURL(file)}
+                        alt={`Preview ${index}`}
+                        className="w-16 h-16 object-cover rounded-md"
+                      />
+                      <button
+                        type="button"
+                        onClick={() =>
+                          setSelectedFiles((files) =>
+                            files.filter((_, i) => i !== index)
+                          )
+                        }
+                        className="absolute -top-2 -right-2 bg-red-500 rounded-full p-1 text-white hover:bg-red-600"
+                      >
+                        <X size={12} />
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </form>
+          </>
         ) : (
-          ""
+          <div className="flex-1 flex items-center justify-center">
+            <p className="text-2xl text-gray-400">
+              Select a conversation to start chatting
+            </p>
+          </div>
         )}
       </section>
-    </div>
+    </motion.div>
   );
 }
-
-export default Inbox;
