@@ -65,41 +65,66 @@ const SearchUserTab = ({ setSearchUserTabOpen }) => {
   };
 
   return (
-    <div className="border p-6 bg-gradient-to-r from-violet-700 via-purple-700 to-fuchsia-800 rounded-lg">
-      <input
-        type="text"
-        placeholder="Search Users"
-        value={searchQuery}
-        className="p-1 px-2 pr-3 w-56 rounded-md outline-none font-mono bg-white border-b  border-white/20 shadow-md hover:border-r-2 hover:border-b-2 text-black cursor-pointer"
-        onChange={(e) => setSearchQuery(e.target.value)}
-      />
-      <div className="mt-4">
+    <motion.div
+      initial={{ opacity: 0, y: -20 }}
+      animate={{ opacity: 1, y: 0 }}
+      exit={{ opacity: 0, y: -20 }}
+      transition={{ duration: 0.3 }}
+      className="bg-black/20 rounded-lg p-4 mb-4"
+    >
+      <div className="relative mb-4">
+        <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
+        <input
+          type="text"
+          placeholder="Search Users"
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+          className="w-full pl-10 pr-4 py-2 bg-black/10 text-white placeholder-gray-400 rounded-full focus:outline-none focus:ring-2 focus:ring-purple-500"
+        />
+      </div>
+      <div className="space-y-2 max-h-60 overflow-y-auto">
         {searchedUsers.length > 0
           ? searchedUsers.map((user) => (
-              <div
+              <motion.div
                 key={user._id}
-                className="hover:border text-white/70 flex mt-2 rounded-lg bg-black  hover:bg-white/15 cursor-pointer transition-all shadow-md p-2"
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
+                className="bg-black/10 p-3 rounded-lg cursor-pointer hover:bg-black/20 transition-colors duration-200 flex items-center space-x-3"
                 onClick={() =>
                   createConversation(user._id, user.name, user.avatar)
                 }
               >
                 {user.avatar ? (
                   <img
-                    className="w-8 h-8"
+                    className="w-10 h-10 rounded-full object-cover"
                     src={`${apiUrl}/uploads/avatars/${user.avatar}`}
+                    alt={`${user.name}'s avatar`}
                   />
                 ) : (
-                  <SquareUserRound className="w-8 h-8" />
+                  <SquareUserRound className="w-10 h-10 text-gray-400" />
                 )}
-                <div className="px-2">
-                  <h4>{user.name}</h4>
-                  <p>{user.email || user.mobile}</p>
+                <div>
+                  <h4 className="text-white font-semibold">{user.name}</h4>
+                  <p className="text-gray-300 text-sm">
+                    {user.email || user.mobile}
+                  </p>
                 </div>
-              </div>
+              </motion.div>
             ))
-          : ""}
+          : searchQuery.length > 0 && (
+              <p className="text-center text-gray-400">No users found</p>
+            )}
       </div>
-    </div>
+      <motion.button
+        whileHover={{ scale: 1.05 }}
+        whileTap={{ scale: 0.95 }}
+        className="mt-4 flex items-center justify-center p-2 bg-purple-600 text-white rounded-full shadow-lg hover:bg-purple-700 transition-colors duration-200 w-full"
+        onClick={() => setSearchUserTabOpen(false)}
+      >
+        <X size={20} />
+        <span className="ml-2">Close</span>
+      </motion.button>
+    </motion.div>
   );
 };
 

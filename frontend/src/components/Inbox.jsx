@@ -225,14 +225,14 @@ export default function Inbox({ loggedInUser }) {
       className="mt-16 bg-gradient-to-br from-purple-700 to-indigo-800 rounded-xl shadow-2xl h-[calc(100vh-4rem)] w-full flex overflow-hidden"
     >
       <section className="w-1/4 bg-black/20 p-4 flex flex-col">
-        <div className="relative mb-4">
+        {/* <div className="relative mb-4">
           <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
           <input
             type="text"
             placeholder="Search Users"
             className="w-full pl-10 pr-4 py-2 bg-black/10 text-white placeholder-gray-400 rounded-full focus:outline-none focus:ring-2 focus:ring-purple-500"
           />
-        </div>
+        </div> */}
 
         <motion.button
           whileHover={{ scale: 1.05 }}
