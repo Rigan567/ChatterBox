@@ -51,8 +51,16 @@ const addConversation = async (req, res) => {
   try {
     // Check if the conversation already exists
     const existingConversation = await Conversation.findOne({
-      "creator.id": req.user.userid,
-      "participant.id": req.body.id,
+      $or: [
+        {
+          "creator.id": req.user.userid,
+          "participant.id": req.body.id,
+        },
+        {
+          "creator.id": req.body.id,
+          "participant.id": req.user.userid,
+        },
+      ],
     });
 
     if (existingConversation) {

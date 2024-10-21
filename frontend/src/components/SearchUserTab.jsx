@@ -1,7 +1,9 @@
 import { SquareUserRound } from "lucide-react";
 import React, { useEffect, useState } from "react";
 import { toast } from "react-toastify";
+import { motion } from "framer-motion";
 import { apiUrl } from "../config";
+import { Search, X } from "lucide-react";
 
 const SearchUserTab = ({ setSearchUserTabOpen }) => {
   const [searchQuery, setSearchQuery] = useState("");
