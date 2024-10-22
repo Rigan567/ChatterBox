@@ -98,7 +98,7 @@ export default function Inbox({ loggedInUser }) {
 
   useEffect(() => {
     fetchConversation();
-  }, [fetchConversation]);
+  }, []);
 
   const getMessages = async (conversation_id, conversation_name) => {
     try {
@@ -209,262 +209,6 @@ export default function Inbox({ loggedInUser }) {
     }
   };
 
-  /* conversation section */
-  const ConversationList = () => (
-    <section
-      className={`bg-black/20 p-4 flex flex-col ${
-        showMobileMessages ? "hidden md:flex" : "w-full md:w-1/4"
-      }`}
-    >
-      <motion.button
-        whileHover={{ scale: 1.05 }}
-        whileTap={{ scale: 0.95 }}
-        className="mb-4 flex items-center justify-center p-2 bg-purple-600 text-white rounded-full shadow-lg hover:bg-purple-700 transition-colors duration-200"
-        onClick={() => setSearchUserTabOpen(!searchUserTabOpen)}
-      >
-        {searchUserTabOpen ? <X size={24} /> : <Plus size={24} />}
-        <span className="ml-2">{searchUserTabOpen ? "Close" : "New Chat"}</span>
-      </motion.button>
-
-      <AnimatePresence>
-        {searchUserTabOpen && (
-          <motion.div
-            initial={{ opacity: 0, height: 0 }}
-            animate={{ opacity: 1, height: "auto" }}
-            exit={{ opacity: 0, height: 0 }}
-            transition={{ duration: 0.3 }}
-          >
-            <SearchUserTab
-              setSearchUserTabOpen={setSearchUserTabOpen}
-              apiUrl={apiUrl}
-            />
-          </motion.div>
-        )}
-      </AnimatePresence>
-
-      <div className="flex-1 overflow-y-auto space-y-2">
-        {conversation.length > 0 ? (
-          conversation.map((conv) => {
-            const isLoggedInUserAndParticipantSame =
-              loggedInUser.userid === conv.participant.id;
-            const convDisplayUser = isLoggedInUserAndParticipantSame
-              ? conv.creator
-              : conv.participant;
-
-            return (
-              <motion.div
-                key={conv._id}
-                whileHover={{ scale: 1.02 }}
-                whileTap={{ scale: 0.98 }}
-                className="bg-black/10 p-3 rounded-lg cursor-pointer hover:bg-black/20 transition-colors duration-200"
-                onClick={() => {
-                  getMessages(conv._id, convDisplayUser.name);
-                  setShowMobileMessages(true);
-                }}
-              >
-                <div className="flex items-center space-x-3">
-                  <img
-                    className="w-10 h-10 rounded-full object-cover"
-                    src={
-                      convDisplayUser?.avatar
-                        ? `${apiUrl}/uploads/avatars/${convDisplayUser.avatar}`
-                        : noPhoto
-                    }
-                    alt={`${convDisplayUser.name}'s avatar`}
-                  />
-                  <div>
-                    <h4 className="text-white font-semibold">
-                      {convDisplayUser.name}
-                    </h4>
-                    <p className="text-gray-300 text-sm">
-                      {moment(conv.createdAt).fromNow()}
-                    </p>
-                  </div>
-                </div>
-              </motion.div>
-            );
-          })
-        ) : (
-          <p className="text-center text-gray-400">No conversations yet.</p>
-        )}
-      </div>
-    </section>
-  );
-
-  /* Message Section  */
-  const MessageSection = () => (
-    <section
-      className={`flex-1 flex flex-col bg-black/10 ${
-        showMobileMessages ? "w-full md:flex" : "hidden md:flex"
-      }`}
-    >
-      {currentConversationName ? (
-        <>
-          <div className="flex justify-between items-center px-6 py-4 bg-black/20">
-            <button
-              onClick={() => setShowMobileMessages(false)}
-              className="text-white mr-2"
-            >
-              <ArrowLeft size={24} />
-            </button>
-
-            <div className="flex items-center space-x-3">
-              {displayUser && (
-                <img
-                  src={
-                    displayUser.avatar
-                      ? `${apiUrl}/uploads/avatars/${displayUser.avatar}`
-                      : noPhoto
-                  }
-                  alt={displayUser.name || "User"}
-                  className="w-10 h-10 rounded-full object-cover"
-                />
-              )}
-
-              <h3 className="text-white text-lg font-semibold">
-                {currentConversationName}
-              </h3>
-            </div>
-            <motion.button
-              whileHover={{ scale: 1.1 }}
-              whileTap={{ scale: 0.9 }}
-              className="text-red-500 hover:text-red-600"
-              onClick={() => removeConversation(participant.id)}
-            >
-              <Trash2 size={20} />
-            </motion.button>
-          </div>
-          {/* Message Container */}
-          <div
-            ref={messageContainerRef}
-            className="flex-1 overflow-y-auto p-6 space-y-4"
-          >
-            {messages.length > 0 ? (
-              messages.map((message, index) => {
-                const sender = message.sender || {};
-                const senderAvatar = sender.avatar
-                  ? `${apiUrl}/uploads/avatars/${sender.avatar}`
-                  : `${noPhoto}`;
-                const isCurrentUser = sender.id === loggedInUser.userid;
-                return (
-                  <motion.div
-                    key={message.id || index}
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.3 }}
-                    className={`flex ${
-                      isCurrentUser ? "justify-end" : "justify-start"
-                    }`}
-                  >
-                    {!isCurrentUser && sender.name && (
-                      <img
-                        src={senderAvatar}
-                        alt={sender.name}
-                        className="w-8 h-8 rounded-full"
-                      />
-                    )}
-                    <div
-                      className={`max-w-xs lg:max-w-md xl:max-w-lg ${
-                        isCurrentUser ? "bg-purple-600" : "bg-gray-700"
-                      } rounded-lg px-4 py-2 shadow-md`}
-                    >
-                      <p className="text-white">{message.text}</p>
-                      {message.attachment && message.attachment.length > 0 && (
-                        <div className="mt-2 flex flex-wrap gap-2">
-                          {message.attachment.map((attachment, idx) => (
-                            <img
-                              key={idx}
-                              src={`${apiUrl}/uploads/attachments/${attachment}`}
-                              alt="attachment"
-                              className="w-16 h-16 object-cover rounded-md"
-                            />
-                          ))}
-                        </div>
-                      )}
-                      <p className="text-xs text-gray-300 mt-1">
-                        {moment(message.date_time).fromNow()}
-                      </p>
-                    </div>
-                  </motion.div>
-                );
-              })
-            ) : (
-              <p className="text-center text-gray-400">No messages yet</p>
-            )}
-          </div>
-
-          <form onSubmit={handleSubmit(onSubmit)} className="p-4 bg-black/20">
-            <div className="flex items-center space-x-2">
-              <motion.label
-                whileHover={{ scale: 1.1 }}
-                whileTap={{ scale: 0.9 }}
-                className="cursor-pointer text-gray-400 hover:text-gray-200"
-              >
-                <Paperclip size={20} />
-                <input
-                  type="file"
-                  multiple
-                  className="hidden"
-                  onChange={handleFileChange}
-                />
-              </motion.label>
-              <input
-                {...register("message", {
-                  required: selectedFiles.length === 0,
-                })}
-                className="flex-1 bg-black/10 text-white rounded-full px-4 py-2 focus:outline-none focus:ring-2 focus:ring-purple-500"
-                placeholder="Type a message..."
-              />
-              <motion.button
-                whileHover={{ scale: 1.1 }}
-                whileTap={{ scale: 0.9 }}
-                type="submit"
-                disabled={!selectedFiles.length && !watch("message")}
-                className={`rounded-full p-2 transition-colors duration-200 ${
-                  !selectedFiles.length && !watch("message")
-                    ? "bg-gray-400 cursor-not-allowed"
-                    : "bg-purple-600 hover:bg-purple-700"
-                }`}
-              >
-                <Send size={20} />
-              </motion.button>
-            </div>
-            {selectedFiles.length > 0 && (
-              <div className="mt-2 flex flex-wrap gap-2">
-                {selectedFiles.map((file, index) => (
-                  <div key={index} className="relative">
-                    <img
-                      src={URL.createObjectURL(file)}
-                      alt={`Preview ${index}`}
-                      className="w-16 h-16 object-cover rounded-md"
-                    />
-                    <button
-                      type="button"
-                      onClick={() =>
-                        setSelectedFiles((files) =>
-                          files.filter((_, i) => i !== index)
-                        )
-                      }
-                      className="absolute -top-2 -right-2 bg-red-500 rounded-full p-1 text-white hover:bg-red-600"
-                    >
-                      <X size={12} />
-                    </button>
-                  </div>
-                ))}
-              </div>
-            )}
-          </form>
-        </>
-      ) : (
-        <div className="flex-1 flex items-center justify-center">
-          <p className="text-2xl text-gray-400">
-            Select a conversation to start chatting
-          </p>
-        </div>
-      )}
-    </section>
-  );
-
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -473,8 +217,259 @@ export default function Inbox({ loggedInUser }) {
       transition={{ duration: 0.3 }}
       className="mt-16 bg-gradient-to-br from-purple-700 to-indigo-800 rounded-xl shadow-2xl h-[calc(100vh-4rem)] w-full flex overflow-hidden"
     >
-      <ConversationList />
-      <MessageSection />
+      /* conversation section */
+      <section
+        className={`bg-black/20 p-4 flex flex-col ${
+          showMobileMessages ? "hidden md:flex" : "w-full md:w-1/4"
+        }`}
+      >
+        <motion.button
+          whileHover={{ scale: 1.05 }}
+          whileTap={{ scale: 0.95 }}
+          className="mb-4 flex items-center justify-center p-2 bg-purple-600 text-white rounded-full shadow-lg hover:bg-purple-700 transition-colors duration-200"
+          onClick={() => setSearchUserTabOpen(!searchUserTabOpen)}
+        >
+          {searchUserTabOpen ? <X size={24} /> : <Plus size={24} />}
+          <span className="ml-2">
+            {searchUserTabOpen ? "Close" : "New Chat"}
+          </span>
+        </motion.button>
+
+        <AnimatePresence>
+          {searchUserTabOpen && (
+            <motion.div
+              initial={{ opacity: 0, height: 0 }}
+              animate={{ opacity: 1, height: "auto" }}
+              exit={{ opacity: 0, height: 0 }}
+              transition={{ duration: 0.3 }}
+            >
+              <SearchUserTab
+                setSearchUserTabOpen={setSearchUserTabOpen}
+                apiUrl={apiUrl}
+              />
+            </motion.div>
+          )}
+        </AnimatePresence>
+
+        <div className="flex-1 overflow-y-auto space-y-2">
+          {conversation.length > 0 ? (
+            conversation.map((conv) => {
+              const isLoggedInUserAndParticipantSame =
+                loggedInUser.userid === conv.participant.id;
+              const convDisplayUser = isLoggedInUserAndParticipantSame
+                ? conv.creator
+                : conv.participant;
+
+              return (
+                <motion.div
+                  key={conv._id}
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
+                  className="bg-black/10 p-3 rounded-lg cursor-pointer hover:bg-black/20 transition-colors duration-200"
+                  onClick={() => {
+                    getMessages(conv._id, convDisplayUser.name);
+                    setShowMobileMessages(true);
+                  }}
+                >
+                  <div className="flex items-center space-x-3">
+                    <img
+                      className="w-10 h-10 rounded-full object-cover"
+                      src={
+                        convDisplayUser?.avatar
+                          ? `${apiUrl}/uploads/avatars/${convDisplayUser.avatar}`
+                          : noPhoto
+                      }
+                      alt={`${convDisplayUser.name}'s avatar`}
+                    />
+                    <div>
+                      <h4 className="text-white font-semibold">
+                        {convDisplayUser.name}
+                      </h4>
+                      <p className="text-gray-300 text-sm">
+                        {moment(conv.createdAt).fromNow()}
+                      </p>
+                    </div>
+                  </div>
+                </motion.div>
+              );
+            })
+          ) : (
+            <p className="text-center text-gray-400">No conversations yet.</p>
+          )}
+        </div>
+      </section>
+      /* Message Section */
+      <section
+        className={`flex-1 flex flex-col bg-black/10 ${
+          showMobileMessages ? "w-full md:flex" : "hidden md:flex"
+        }`}
+      >
+        {currentConversationName ? (
+          <>
+            <div className="flex justify-between items-center px-6 py-4 bg-black/20">
+              <button
+                onClick={() => setShowMobileMessages(false)}
+                className="text-white mr-2"
+              >
+                <ArrowLeft size={24} />
+              </button>
+
+              <div className="flex items-center space-x-3">
+                {displayUser && (
+                  <img
+                    src={
+                      displayUser.avatar
+                        ? `${apiUrl}/uploads/avatars/${displayUser.avatar}`
+                        : noPhoto
+                    }
+                    alt={displayUser.name || "User"}
+                    className="w-10 h-10 rounded-full object-cover"
+                  />
+                )}
+
+                <h3 className="text-white text-lg font-semibold">
+                  {currentConversationName}
+                </h3>
+              </div>
+              <motion.button
+                whileHover={{ scale: 1.1 }}
+                whileTap={{ scale: 0.9 }}
+                className="text-red-500 hover:text-red-600"
+                onClick={() => removeConversation(participant.id)}
+              >
+                <Trash2 size={20} />
+              </motion.button>
+            </div>
+            {/* Message Container */}
+            <div
+              ref={messageContainerRef}
+              className="flex-1 overflow-y-auto p-6 space-y-4"
+            >
+              {messages.length > 0 ? (
+                messages.map((message, index) => {
+                  const sender = message.sender || {};
+                  const senderAvatar = sender.avatar
+                    ? `${apiUrl}/uploads/avatars/${sender.avatar}`
+                    : `${noPhoto}`;
+                  const isCurrentUser = sender.id === loggedInUser.userid;
+                  return (
+                    <motion.div
+                      key={message.id || index}
+                      initial={{ opacity: 0, y: 20 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ duration: 0.3 }}
+                      className={`flex ${
+                        isCurrentUser ? "justify-end" : "justify-start"
+                      }`}
+                    >
+                      {!isCurrentUser && sender.name && (
+                        <img
+                          src={senderAvatar}
+                          alt={sender.name}
+                          className="w-8 h-8 rounded-full"
+                        />
+                      )}
+                      <div
+                        className={`max-w-xs lg:max-w-md xl:max-w-lg ${
+                          isCurrentUser ? "bg-purple-600" : "bg-gray-700"
+                        } rounded-lg px-4 py-2 shadow-md`}
+                      >
+                        <p className="text-white">{message.text}</p>
+                        {message.attachment &&
+                          message.attachment.length > 0 && (
+                            <div className="mt-2 flex flex-wrap gap-2">
+                              {message.attachment.map((attachment, idx) => (
+                                <img
+                                  key={idx}
+                                  src={`${apiUrl}/uploads/attachments/${attachment}`}
+                                  alt="attachment"
+                                  className="w-16 h-16 object-cover rounded-md"
+                                />
+                              ))}
+                            </div>
+                          )}
+                        <p className="text-xs text-gray-300 mt-1">
+                          {moment(message.date_time).fromNow()}
+                        </p>
+                      </div>
+                    </motion.div>
+                  );
+                })
+              ) : (
+                <p className="text-center text-gray-400">No messages yet</p>
+              )}
+            </div>
+
+            <form onSubmit={handleSubmit(onSubmit)} className="p-4 bg-black/20">
+              <div className="flex items-center space-x-2">
+                <motion.label
+                  whileHover={{ scale: 1.1 }}
+                  whileTap={{ scale: 0.9 }}
+                  className="cursor-pointer text-gray-400 hover:text-gray-200"
+                >
+                  <Paperclip size={20} />
+                  <input
+                    type="file"
+                    multiple
+                    className="hidden"
+                    onChange={handleFileChange}
+                  />
+                </motion.label>
+                <input
+                  {...register("message", {
+                    required: selectedFiles.length === 0,
+                  })}
+                  className="flex-1 bg-black/10 text-white rounded-full px-4 py-2 focus:outline-none focus:ring-2 focus:ring-purple-500"
+                  placeholder="Type a message..."
+                />
+                <motion.button
+                  whileHover={{ scale: 1.1 }}
+                  whileTap={{ scale: 0.9 }}
+                  type="submit"
+                  disabled={!selectedFiles.length && !watch("message")}
+                  className={`rounded-full p-2 transition-colors duration-200 ${
+                    !selectedFiles.length && !watch("message")
+                      ? "bg-gray-400 cursor-not-allowed"
+                      : "bg-purple-600 hover:bg-purple-700"
+                  }`}
+                >
+                  <Send size={20} />
+                </motion.button>
+              </div>
+              {selectedFiles.length > 0 && (
+                <div className="mt-2 flex flex-wrap gap-2">
+                  {selectedFiles.map((file, index) => (
+                    <div key={index} className="relative">
+                      <img
+                        src={URL.createObjectURL(file)}
+                        alt={`Preview ${index}`}
+                        className="w-16 h-16 object-cover rounded-md"
+                      />
+                      <button
+                        type="button"
+                        onClick={() =>
+                          setSelectedFiles((files) =>
+                            files.filter((_, i) => i !== index)
+                          )
+                        }
+                        className="absolute -top-2 -right-2 bg-red-500 rounded-full p-1 text-white hover:bg-red-600"
+                      >
+                        <X size={12} />
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </form>
+          </>
+        ) : (
+          <div className="flex-1 flex items-center justify-center">
+            <p className="text-2xl text-gray-400">
+              Select a conversation to start chatting
+            </p>
+          </div>
+        )}
+      </section>
     </motion.div>
   );
 }
