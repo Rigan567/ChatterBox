@@ -1,6 +1,6 @@
 import React from "react";
 import { useForm } from "react-hook-form";
-import { MessageSquareMore } from "lucide-react";
+import { MessageSquareMore, Upload } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { apiUrl } from "../config";
 

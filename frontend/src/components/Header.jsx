@@ -1,12 +1,13 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { EllipsisVertical } from "lucide-react";
+import { EllipsisVertical, X, Menu } from "lucide-react";
 import { apiUrl } from "../config";
 
 export default function Header({ loggedInUser, setIsLoggedIn, isLoggedIn }) {
   const navigate = useNavigate();
   const [eclipseOn, setEclipseOn] = useState(false);
   const [showWarning, setShowWarning] = useState(false);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   // Handle Logout
   const handleLogout = async () => {
@@ -67,6 +68,7 @@ export default function Header({ loggedInUser, setIsLoggedIn, isLoggedIn }) {
     } else {
       navigate(`/${item.toLowerCase()}`);
     }
+    setMobileMenuOpen(false);
   };
 
   return (
