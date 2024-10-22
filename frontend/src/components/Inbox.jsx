@@ -1,15 +1,7 @@
 import React, { useEffect, useState, useRef } from "react";
 import { useForm } from "react-hook-form";
 import { motion, AnimatePresence } from "framer-motion";
-import {
-  CirclePlus,
-  Paperclip,
-  Plus,
-  Trash2,
-  X,
-  Search,
-  Send,
-} from "lucide-react";
+import { Paperclip, Plus, Trash2, X, Send, ArrowLeft } from "lucide-react";
 import SearchUserTab from "./SearchUserTab";
 import moment from "moment";
 import { toast } from "react-toastify";
