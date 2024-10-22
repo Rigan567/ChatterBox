@@ -217,7 +217,7 @@ export default function Inbox({ loggedInUser }) {
       transition={{ duration: 0.3 }}
       className="mt-16 bg-gradient-to-br from-purple-700 to-indigo-800 rounded-xl shadow-2xl h-[calc(100vh-4rem)] w-full flex overflow-hidden"
     >
-      /* conversation section */
+      {/* conversation section */}
       <section
         className={`bg-black/20 p-4 flex flex-col ${
           showMobileMessages ? "hidden md:flex" : "w-full md:w-1/4"
@@ -298,7 +298,7 @@ export default function Inbox({ loggedInUser }) {
           )}
         </div>
       </section>
-      /* Message Section */
+      {/* Message Section */}
       <section
         className={`flex-1 flex flex-col bg-black/10 ${
           showMobileMessages ? "w-full md:flex" : "hidden md:flex"
