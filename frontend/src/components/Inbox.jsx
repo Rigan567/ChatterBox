@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef, useCallback } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { useForm } from "react-hook-form";
 import { motion, AnimatePresence } from "framer-motion";
 import { Paperclip, Plus, Trash2, X, Send, ArrowLeft } from "lucide-react";
@@ -23,18 +23,7 @@ export default function Inbox({ loggedInUser }) {
   const messageContainerRef = useRef(null);
   const { register, handleSubmit, reset, watch } = useForm();
   const [displayUser, setDisplayUser] = useState(null);
-  const [isMobileView, setIsMobileView] = useState(false);
-  const [showMessages, setShowMessages] = useState(false);
-
-  const handleResize = useCallback(() => {
-    setIsMobileView(window.innerWidth < 768);
-  }, []);
-
-  useEffect(() => {
-    handleResize();
-    window.addEventListener("resize", handleResize);
-    return () => window.removeEventListener("resize", handleResize);
-  }, [handleResize]);
+  const [showMobileMessages, setShowMobileMessages] = useState(false);
 
   useEffect(() => {
     if (conversation.length > 0 && currentConversationId) {
@@ -93,7 +82,7 @@ export default function Inbox({ loggedInUser }) {
     }
   }, [messages]);
 
-  const fetchConversation = useCallback(async () => {
+  const fetchConversation = async () => {
     try {
       const response = await fetch(`${apiUrl}/inbox`, {
         credentials: "include",
@@ -105,43 +94,37 @@ export default function Inbox({ loggedInUser }) {
     } catch (error) {
       console.log(`Error Here Is: ${error}`);
     }
-  }, []);
+  };
 
   useEffect(() => {
     fetchConversation();
   }, [fetchConversation]);
 
-  const getMessages = useCallback(
-    async (conversation_id, conversation_name) => {
-      try {
-        const response = await fetch(
-          `${apiUrl}/inbox/messages/${conversation_id}`,
-          { credentials: "include" }
+  const getMessages = async (conversation_id, conversation_name) => {
+    try {
+      const response = await fetch(
+        `${apiUrl}/inbox/messages/${conversation_id}`,
+        { credentials: "include" }
+      );
+      const result = await response.json();
+      if (!result.errors && result.data) {
+        setFormVisible(true);
+        const { data } = result;
+        setParticipant(data.participant);
+        setCreator(data.creator);
+        setCurrentConversationId(conversation_id);
+        setCurrentConversationName(conversation_name);
+        setMessages(
+          data.messages && data.messages.length > 0 ? data.messages : []
         );
-        const result = await response.json();
-        if (!result.errors && result.data) {
-          setFormVisible(true);
-          const { data } = result;
-          setParticipant(data.participant);
-          setCreator(data.creator);
-          setCurrentConversationId(conversation_id);
-          setCurrentConversationName(conversation_name);
-          setMessages(
-            data.messages && data.messages.length > 0 ? data.messages : []
-          );
-          if (isMobileView) {
-            setShowMessages(true);
-          }
-        } else {
-          toast.error("Error loading messages!");
-        }
-      } catch (error) {
-        console.error("Failed to fetch messages:", error);
+      } else {
         toast.error("Error loading messages!");
       }
-    },
-    [isMobileView]
-  );
+    } catch (error) {
+      console.error("Failed to fetch messages:", error);
+      toast.error("Error loading messages!");
+    }
+  };
 
   const handleFileChange = (e) => {
     const files = Array.from(e.target.files);
@@ -220,9 +203,6 @@ export default function Inbox({ loggedInUser }) {
         );
         setCurrentConversationName(null);
         fetchConversation();
-        if (isMobileView) {
-          setShowMessages(false);
-        }
       }
     } catch (error) {
       toast.error(error.msg);
@@ -232,9 +212,9 @@ export default function Inbox({ loggedInUser }) {
   /* conversation section */
   const ConversationList = () => (
     <section
-      className={`${
-        isMobileView ? "w-full" : "w-1/4"
-      } bg-black/20 p-4 flex flex-col`}
+      className={`bg-black/20 p-4 flex flex-col ${
+        showMobileMessages ? "hidden md:flex" : "w-full md:w-1/4"
+      }`}
     >
       <motion.button
         whileHover={{ scale: 1.05 }}
@@ -277,7 +257,10 @@ export default function Inbox({ loggedInUser }) {
                 whileHover={{ scale: 1.02 }}
                 whileTap={{ scale: 0.98 }}
                 className="bg-black/10 p-3 rounded-lg cursor-pointer hover:bg-black/20 transition-colors duration-200"
-                onClick={() => getMessages(conv._id, convDisplayUser.name)}
+                onClick={() => {
+                  getMessages(conv._id, convDisplayUser.name);
+                  setShowMobileMessages(true);
+                }}
               >
                 <div className="flex items-center space-x-3">
                   <img
@@ -310,18 +293,21 @@ export default function Inbox({ loggedInUser }) {
 
   /* Message Section  */
   const MessageSection = () => (
-    <section className="flex-1 flex flex-col bg-black/10">
+    <section
+      className={`flex-1 flex flex-col bg-black/10 ${
+        showMobileMessages ? "w-full md:flex" : "hidden md:flex"
+      }`}
+    >
       {currentConversationName ? (
         <>
           <div className="flex justify-between items-center px-6 py-4 bg-black/20">
-            {isMobileView && (
-              <button
-                onClick={() => setShowMessages(false)}
-                className="text-white mr-2"
-              >
-                <ArrowLeft size={24} />
-              </button>
-            )}
+            <button
+              onClick={() => setShowMobileMessages(false)}
+              className="text-white mr-2"
+            >
+              <ArrowLeft size={24} />
+            </button>
+
             <div className="flex items-center space-x-3">
               {displayUser && (
                 <img
@@ -487,18 +473,8 @@ export default function Inbox({ loggedInUser }) {
       transition={{ duration: 0.3 }}
       className="mt-16 bg-gradient-to-br from-purple-700 to-indigo-800 rounded-xl shadow-2xl h-[calc(100vh-4rem)] w-full flex overflow-hidden"
     >
-      {isMobileView ? (
-        showMessages ? (
-          <MessageSection />
-        ) : (
-          <ConversationList />
-        )
-      ) : (
-        <>
-          <ConversationList />
-          <MessageSection />
-        </>
-      )}
+      <ConversationList />
+      <MessageSection />
     </motion.div>
   );
 }
