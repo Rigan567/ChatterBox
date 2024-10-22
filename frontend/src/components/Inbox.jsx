@@ -87,8 +87,9 @@ export default function Inbox({ loggedInUser }) {
       const response = await fetch(`${apiUrl}/inbox`, {
         credentials: "include",
       });
-      if (!response.ok)
+      if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
+      }
       const result = await response.json();
       setConversation(result);
     } catch (error) {
@@ -98,7 +99,7 @@ export default function Inbox({ loggedInUser }) {
 
   useEffect(() => {
     fetchConversation();
-  }, []);
+  }, [conversation]);
 
   const getMessages = async (conversation_id, conversation_name) => {
     try {
@@ -215,7 +216,7 @@ export default function Inbox({ loggedInUser }) {
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, y: -20 }}
       transition={{ duration: 0.3 }}
-      className="mt-16 bg-gradient-to-br from-purple-700 to-indigo-800 rounded-xl shadow-2xl h-[calc(100vh-4rem)] w-full flex overflow-hidden"
+      className="mt-16 bg-gradient-to-br from-purple-700 to-indigo-800 rounded-xl shadow-2xl h-[calc(100vh-6rem)] w-full flex overflow-hidden"
     >
       {/* conversation section */}
       <section
@@ -243,10 +244,7 @@ export default function Inbox({ loggedInUser }) {
               exit={{ opacity: 0, height: 0 }}
               transition={{ duration: 0.3 }}
             >
-              <SearchUserTab
-                setSearchUserTabOpen={setSearchUserTabOpen}
-                apiUrl={apiUrl}
-              />
+              <SearchUserTab setSearchUserTabOpen={setSearchUserTabOpen} />
             </motion.div>
           )}
         </AnimatePresence>
@@ -309,7 +307,7 @@ export default function Inbox({ loggedInUser }) {
             <div className="flex justify-between items-center px-6 py-4 bg-black/20">
               <button
                 onClick={() => setShowMobileMessages(false)}
-                className="text-white mr-2"
+                className="text-white mr-2 md:hidden"
               >
                 <ArrowLeft size={24} />
               </button>
@@ -401,11 +399,11 @@ export default function Inbox({ loggedInUser }) {
             </div>
 
             <form onSubmit={handleSubmit(onSubmit)} className="p-4 bg-black/20">
-              <div className="flex items-center space-x-2">
+              <div className="flex items-center space-x-2  px-2 py-2">
                 <motion.label
                   whileHover={{ scale: 1.1 }}
                   whileTap={{ scale: 0.9 }}
-                  className="cursor-pointer text-gray-400 hover:text-gray-200"
+                  className="cursor-pointer text-gray-400 hover:text-gray-200  flex-shrink-0"
                 >
                   <Paperclip size={20} />
                   <input
@@ -419,7 +417,7 @@ export default function Inbox({ loggedInUser }) {
                   {...register("message", {
                     required: selectedFiles.length === 0,
                   })}
-                  className="flex-1 bg-black/10 text-white rounded-full px-4 py-2 focus:outline-none focus:ring-2 focus:ring-purple-500"
+                  className="flex-1 min-w-0 bg-black/10 text-white rounded-full px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-purple-500"
                   placeholder="Type a message..."
                 />
                 <motion.button
@@ -427,13 +425,13 @@ export default function Inbox({ loggedInUser }) {
                   whileTap={{ scale: 0.9 }}
                   type="submit"
                   disabled={!selectedFiles.length && !watch("message")}
-                  className={`rounded-full p-2 transition-colors duration-200 ${
+                  className={`rounded-full p-2 transition-colors duration-200 flex-shrink-0 ${
                     !selectedFiles.length && !watch("message")
                       ? "bg-gray-400 cursor-not-allowed"
                       : "bg-purple-600 hover:bg-purple-700"
                   }`}
                 >
-                  <Send size={20} />
+                  <Send size={18} />
                 </motion.button>
               </div>
               {selectedFiles.length > 0 && (
