@@ -70,70 +70,98 @@ export default function Header({ loggedInUser, setIsLoggedIn, isLoggedIn }) {
   };
 
   return (
-    <div
-      id="header"
-      className="fixed min-h-18 mb-56 top-0 left-0 right-0 bg-black/20 backdrop-blur-md shadow-sm  z-10"
-    >
-      <div className=" relative container mx-auto px-4 py-1 flex justify-around items-center gap-5">
-        <div className="p-2 rounded-lg bg-gradient-to-tl from-violet-700 to-blue-600">
-          {isLoggedIn && loggedInUser ? (
-            <div className="flex gap-1 w-fit h-fit items-center">
-              <img
-                className="border rounded-lg h-9 object-cover"
-                src={
-                  loggedInUser.avatar
-                    ? `${apiUrl}/uploads/avatars/${loggedInUser.avatar}`
-                    : null
-                }
-                alt=""
-              />
-              <p className="text-white">{` ${loggedInUser.username}`}</p>
+    <header className="fixed top-0 left-0 right-0 bg-black/20 backdrop-blur-md shadow-sm z-10">
+      <div className="container mx-auto px-4 py-4">
+        <div className="flex justify-between items-center">
+          <div className="flex items-center space-x-4">
+            <div className="p-2 rounded-lg bg-gradient-to-tl from-violet-700 to-blue-600">
+              {isLoggedIn && loggedInUser ? (
+                <div className="flex items-center space-x-2">
+                  <img
+                    className="h-8 w-8 rounded-full object-cover"
+                    src={
+                      loggedInUser.avatar
+                        ? `${apiUrl}/uploads/avatars/${loggedInUser.avatar}`
+                        : "/placeholder.svg?height=32&width=32"
+                    }
+                    alt={loggedInUser.username}
+                  />
+                  <p className="text-white text-sm font-medium">
+                    {loggedInUser.username}
+                  </p>
+                </div>
+              ) : (
+                <p className="text-white text-sm font-medium">Not logged in</p>
+              )}
             </div>
-          ) : (
-            <p className="text-white">Not logged in</p>
+          </div>
+
+          <nav className="hidden md:flex space-x-4">
+            {navItems.map((item, index) => (
+              <button
+                key={index}
+                className="text-white hover:text-gray-300 transition-colors duration-200"
+                onClick={() => handleNavigation(item)}
+              >
+                {item}
+              </button>
+            ))}
+          </nav>
+
+          <div className="md:hidden">
+            <button
+              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+              className="text-white focus:outline-none"
+            >
+              {mobileMenuOpen ? (
+                <X className="h-6 w-6" />
+              ) : (
+                <Menu className="h-6 w-6" />
+              )}
+            </button>
+          </div>
+
+          {loggedInUser && (
+            <button
+              onClick={() => setEclipseOn(!eclipseOn)}
+              className="hidden md:block text-white focus:outline-none"
+            >
+              <EllipsisVertical className="h-6 w-6" />
+            </button>
           )}
         </div>
-        <nav className="flex space-x-4 text-white">
-          {navItems.map((item, index) => (
-            <button
-              className="border-b border-b-transparent hover:border-b-white hover:scale-105 transition-all ease-out"
-              key={index}
-              onClick={() => handleNavigation(item)}
-            >
-              {item}
-            </button>
-          ))}
-        </nav>
-        {loggedInUser ? (
-          <button onClick={() => setEclipseOn(!eclipseOn)}>
-            <EllipsisVertical className="text-white size-icon" />
-          </button>
-        ) : (
-          ""
+
+        {mobileMenuOpen && (
+          <nav className="mt-4 space-y-2">
+            {navItems.map((item, index) => (
+              <button
+                key={index}
+                className="block w-full text-left text-white hover:text-gray-300 transition-colors duration-200 py-2"
+                onClick={() => handleNavigation(item)}
+              >
+                {item}
+              </button>
+            ))}
+          </nav>
         )}
-        {eclipseOn ? (
-          <aside
-            className={`${
-              eclipseOn ? "translate-y-0" : "translate-y-2"
-            } border cursor-pointer absolute right-12 top-12 mt-2 mr-7 p-2 rounded-lg bg-gradient-to-r from-fuchsia-800 to-pink-800 hover:from-fuchsia-900 hover:to-pink-900 hover:drop-shadow-md transition-transform`}
-            onClick={handleRemoveClick}
-          >
-            {loggedInUser ? (
-              <p className="text-white">{`Remove Account of ${loggedInUser.username}`}</p>
-            ) : (
-              ""
-            )}
-          </aside>
-        ) : null}
       </div>
-      {/* Warning Tab for confirmation */}
+
+      {eclipseOn && (
+        <div
+          className="absolute right-4 top-16 mt-2 p-2 rounded-lg bg-gradient-to-r from-fuchsia-800 to-pink-800 hover:from-fuchsia-900 hover:to-pink-900 transition-all duration-200 cursor-pointer"
+          onClick={handleRemoveClick}
+        >
+          <p className="text-white text-sm">Remove Account</p>
+        </div>
+      )}
+
       {showWarning && (
         <WarningTab
           message="This will remove your account with all your conversations, messages, and attachments. Do you still want to continue?"
           handleConfirm={handleConfirm}
         />
       )}
-    </div>
+    </header>
   );
 }
 

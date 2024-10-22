@@ -46,66 +46,67 @@ export default function Login() {
   };
 
   return (
-    <div className="mt-16 bg-white/30 backdrop-blur-md rounded-xl drop-shadow-md h-screen w-full md:w-fit flex hover:shadow-xl">
-      <section className="hidden md:block drop-shadow-xl w-3/6 bg-gradient-to-b from-fuchsia-900 to-purple-800 rounded-xl">
-        <div className="w-96 h-full flex items-center justify-center">
-          <MessageSquareMore className="h-48 w-48 cursor-pointer hover:scale-125 hover:-rotate-45 hover:-translate-y-4 transition-all ease-in-out" />
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-purple-700 to-indigo-800 p-4">
+      <div className="w-full max-w-4xl bg-white/10 backdrop-blur-md rounded-2xl shadow-xl overflow-hidden flex flex-col md:flex-row">
+        <div className="w-full md:w-1/2 bg-gradient-to-b from-fuchsia-900 to-purple-800 p-12 flex items-center justify-center">
+          <MessageSquareMore className="text-white h-32 w-32 md:h-48 md:w-48 transition-all duration-300 ease-in-out transform hover:scale-110 hover:-rotate-12" />
         </div>
-      </section>
-      <section className="pt-24 rounded-xl flex justify-center items-center">
-        <form
-          className="space-y-4 sm:w-96 p-5 flex flex-col flex-1 flex-wrap justify-center items-center"
-          onSubmit={handleSubmit(onSubmit)}
-        >
-          <div className="w-full">
-            <label htmlFor="username" className="text-lg pr-5 text-white">
-              Email/Mobile no:
-            </label>
-            <br />
-            <input
-              id="username"
-              className="ml-0 p-1 pr-3 w-full rounded-md outline-none font-serif"
-              {...register("username", {
-                required: "Username is required",
-              })}
-            />
-            {errors.username && (
-              <p className="text-red-500 text-sm mt-1">
-                {errors.username.message}
-              </p>
-            )}
-          </div>
-          <div className="w-full">
-            <label htmlFor="password" className="text-lg pr-5 text-white">
-              Password:
-            </label>
-            <br />
-            <input
-              type="password"
-              id="password"
-              {...register("password", {
-                required: "Password is required",
-              })}
-              className={`border ${
-                errors.password ? "border-red-500" : "border-gray-300"
-              } p-1 rounded-md outline-none w-full`}
-            />
-            {errors.password && (
-              <p className="text-red-500 text-sm mt-1">
-                {errors.password.message}
-              </p>
-            )}
-          </div>
-          {loginError && (
-            <p className="text-red-500 text-sm mt-1">{loginError}</p>
-          )}
-          <div className="w-full px-0 py-2">
-            <button className="h-auto px-3 py-2 rounded-md text-white bg-gradient-to-r from-green-600 to-emerald-400 hover:from-green-700 hover:to-emerald-600 ease-in-out">
+        <div className="w-full md:w-1/2 p-8">
+          <h2 className="text-3xl font-bold text-white mb-6">Login</h2>
+          <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+            <div>
+              <label
+                htmlFor="username"
+                className="block text-sm font-medium text-gray-200 mb-1"
+              >
+                Email/Mobile no:
+              </label>
+              <input
+                id="username"
+                className="w-full px-3 py-2 bg-white/20 border border-gray-300 rounded-md text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                placeholder="Enter your email or mobile number"
+                {...register("username", {
+                  required: "Username is required",
+                })}
+              />
+              {errors.username && (
+                <p className="mt-1 text-sm text-red-400">
+                  {errors.username.message}
+                </p>
+              )}
+            </div>
+            <div>
+              <label
+                htmlFor="password"
+                className="block text-sm font-medium text-gray-200 mb-1"
+              >
+                Password:
+              </label>
+              <input
+                type="password"
+                id="password"
+                className="w-full px-3 py-2 bg-white/20 border border-gray-300 rounded-md text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                placeholder="Enter your password"
+                {...register("password", {
+                  required: "Password is required",
+                })}
+              />
+              {errors.password && (
+                <p className="mt-1 text-sm text-red-400">
+                  {errors.password.message}
+                </p>
+              )}
+            </div>
+            {loginError && <p className="text-sm text-red-400">{loginError}</p>}
+            <button
+              type="submit"
+              className="w-full bg-gradient-to-r from-purple-600 to-indigo-600 text-white font-bold py-2 px-4 rounded-md hover:from-purple-700 hover:to-indigo-700 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-opacity-50 transition-all duration-200 ease-in-out transform hover:scale-105"
+            >
               Login
             </button>
-          </div>
-        </form>
-      </section>
+          </form>
+        </div>
+      </div>
     </div>
   );
 }

@@ -35,67 +35,77 @@ function Users({ loggedInUser }) {
   }, [users]);
 
   return (
-    <div className="mt-16 min-h-screen w-full md:w-2/3 bg-white/10 rounded-2xl">
-      <h2 className="text-center text-white text-2xl font-semibold mb-5">
-        {" "}
+    <div className="container mx-auto px-4 py-8 mt-16">
+      <h2 className="text-3xl font-bold text-white mb-6 text-center">
         Manage Users
       </h2>
-      <table className=" w-full ">
-        <thead className="bg-black/40 text-white w-screen ">
-          <tr>
-            <th>Name</th>
-            <th>Email</th>
-            {/* <th>Manage</th> */}
-            <th>Role</th>
-          </tr>
-        </thead>
-        <tbody className="text-white font-normal">
-          {Array.isArray(users) && users.length > 0 ? (
-            users.map((item, index) => (
-              <tr
-                key={item._id}
-                className="cursor-pointer text-center bg-black/15 hover:bg-gradient-to-br hover:from-pink-800/60 hover:to-fuchsia-700 hover:border-b transition-all"
-              >
-                <td className="py-2 flex justify-center">
-                  <div className="w-full flex items-center">
-                    <div className="px-1">
-                      <img
-                        src={`${apiUrl}/uploads/avatars/${item.avatar}`}
-                        className="z-10 w-8 h-8 object-cover rounded-full"
-                        alt={`${item.name}'s avatar`}
-                      />
-                    </div>
-                    <div className="pl-2">
-                      <p>{item.name}</p>
-                    </div>
-                  </div>
-                </td>
-                <td className="py-2">{item.email}</td>
-
-                <td>
-                  {/* If the logged-in user's ID matches, show "admin" */}
-                  {loggedInUser.userid === item._id
-                    ? "Admin"
-                    : item.role || "User"}
-                </td>
+      <div className="bg-white/10 backdrop-blur-md rounded-lg shadow-xl overflow-hidden">
+        <div className="overflow-x-auto">
+          <table className="w-full">
+            <thead className="bg-black/40 text-white">
+              <tr>
+                <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">
+                  Name
+                </th>
+                <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">
+                  Email
+                </th>
+                <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">
+                  Role
+                </th>
               </tr>
-            ))
-          ) : (
-            <tr>
-              <td colSpan="4" className="text-center py-2">
-                No users found. Or You need to{" "}
-                <Link
-                  className="text-blue-400 font-semibold border-b "
-                  to={"/signup"}
-                >
-                  Signup
-                </Link>{" "}
-                first to see the Users.
-              </td>
-            </tr>
-          )}
-        </tbody>
-      </table>
+            </thead>
+            <tbody className="divide-y divide-gray-700">
+              {users.length > 0 ? (
+                users.map((item) => (
+                  <tr
+                    key={item._id}
+                    className="text-white hover:bg-white/5 transition-colors duration-200"
+                  >
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <div className="flex items-center">
+                        <div className="flex-shrink-0 h-10 w-10">
+                          <img
+                            className="h-10 w-10 rounded-full object-cover"
+                            src={`${apiUrl}/uploads/avatars/${item.avatar}`}
+                            alt={`${item.name}'s avatar`}
+                          />
+                        </div>
+                        <div className="ml-4">
+                          <div className="text-sm font-medium">{item.name}</div>
+                        </div>
+                      </div>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <div className="text-sm">{item.email}</div>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
+                        {loggedInUser.userid === item._id
+                          ? "Admin"
+                          : item.role || "User"}
+                      </span>
+                    </td>
+                  </tr>
+                ))
+              ) : (
+                <tr>
+                  <td colSpan="3" className="px-6 py-4 text-center text-white">
+                    No users found. Or You need to{" "}
+                    <Link
+                      to="/signup"
+                      className="text-blue-400 hover:underline"
+                    >
+                      Signup
+                    </Link>{" "}
+                    first to see the Users.
+                  </td>
+                </tr>
+              )}
+            </tbody>
+          </table>
+        </div>
+      </div>
     </div>
   );
 }

@@ -49,137 +49,154 @@ export default function Signup() {
   };
 
   return (
-    <div className="mt-16 bg-white/30 backdrop-blur-md rounded-xl drop-shadow-md h-screen w-full md:w-fit flex hover:shadow-xl ">
-      <section className="hidden md:block drop-shadow-xl w-3/6 bg-gradient-to-b from-fuchsia-900 to-purple-800 rounded-xl">
-        <div className="w-96 h-full  flex items-center justify-center">
-          <MessageSquareMore className="h-48 w-48 cursor-pointer hover:scale-125 hover:-rotate-45 hover:-translate-y-4 transition-all ease-in-out" />
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-purple-700 to-indigo-800 p-4">
+      <div className="w-full max-w-5xl bg-white/10 backdrop-blur-md rounded-2xl shadow-xl overflow-hidden flex flex-col md:flex-row">
+        <div className="w-full md:w-1/2 bg-gradient-to-b from-fuchsia-900 to-purple-800 p-12 flex items-center justify-center">
+          <MessageSquareMore className="text-white h-32 w-32 md:h-48 md:w-48 transition-all duration-300 ease-in-out transform hover:scale-110 hover:-rotate-12" />
         </div>
-      </section>
-      <section className=" pt-24 rounded-xl flex justify-center items-start">
-        <form
-          method="post"
-          encType="multipart/form-data"
-          className="space-y-4   sm:w-96 p-5 flex flex-col flex-1 flex-wrap justify-center items-center"
-          onSubmit={handleSubmit(onSubmit)}
-        >
-          <div className="w-full">
-            <label htmlFor="Name" className="  text-lg pr-5 text-white">
-              Name:
-            </label>
-            <br />
-            <input
-              className=" p-1 px-2 pr-3 w-56 rounded-md outline-none font-mono bg-black/10 border-b  border-white/20 shadow-md hover:border-r-2 hover:border-b-2 text-white"
-              type="text"
-              {...register("name", {
-                required: "Required",
-              })}
-            />
-            {errors.name && (
-              <p className="text-red-500 text-sm mt-1">{errors.name.message}</p>
-            )}
-          </div>
-          <div className="w-full">
-            <label htmlFor="mobile" className="text-lg pr-5 text-white">
-              Mobile Number:
-            </label>
-            <br />
-
-            <input
-              className="p-1 pr-3 w-56 rounded-md outline-none  bg-black/10 font-mono border-b border-white/20 shadow-md hover:border-r-2 hover:border-b-2 text-white"
-              type="tel"
-              {...register("mobile", {
-                required: "Required",
-                pattern: {
-                  value: /^[0-9]{10,14}$/,
-                  message: "Enter a valid mobile number (10-14 digits)",
-                },
-              })}
-            />
-            {errors.mobile && (
-              <p className="text-red-500 text-sm mt-1">
-                {errors.mobile.message}
-              </p>
-            )}
-          </div>
-
-          <div className="w-full">
-            <label htmlFor="email" className="  text-lg pr-5 text-white">
-              Email:
-            </label>
-            <br />
-
-            <input
-              className=" p-1 pr-3 w-56 rounded-md outline-none font-mono bg-black/10 border-b  border-white/20 shadow-md hover:border-r-2 hover:border-b-2 text-white"
-              type="email"
-              {...register("email", {
-                required: "Required",
-                pattern: {
-                  value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
-                  message: "invalid email address",
-                },
-              })}
-            />
-            {errors.email && (
-              <p className="text-red-500 text-sm mt-1">
-                {errors.email.message}
-              </p>
-            )}
-          </div>
-          <div className="w-full">
-            <label htmlFor="password" className=" text-lg pr-5 text-white">
-              Password:
-            </label>
-            <br />
-
-            <input
-              type="password"
-              id="password"
-              {...register("password", {
-                required: "Password is required",
-                minLength: {
-                  value: 8,
-                  message: "Password must be at least 8 characters",
-                },
-                pattern: {
-                  value: /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}$/,
-                  message: "Password must contain letters and numbers",
-                },
-              })}
-              className={`border ${
-                errors.password ? "border-red-500" : "border-gray-300"
-              } p-1 rounded-md outline-none w-56 font-mono bg-black/10 border-b  border-white/20 shadow-md hover:border-r-2 hover:border-b-2 text-white`}
-            />
-            {errors.password && (
-              <p className="text-red-500 text-sm mt-1">
-                {errors.password.message}
-              </p>
-            )}
-          </div>
-
-          <div className="w-full">
-            <label htmlFor="image" className="text-lg pr-5 text-white">
-              Upload Profile Image:
-            </label>
-            <br />
-            <input
-              type="file"
-              accept="image/*"
-              className="cursor-pointer p-1 pl-2 pr-3 w-70 rounded-md outline-none bg-black/10 font-mono border-b border-white/20 shadow-md hover:border-r-2 hover:border-b-2 text-white/75"
-              {...register("image")}
-            />
-            {errors.image && (
-              <p className="text-red-500 text-sm mt-1">
-                {errors.image.message}
-              </p>
-            )}
-          </div>
-          <div className="  w-full  py-2 flex justify-start">
-            <button className="h-auto w-auto px-3 py-2 rounded-md text-white bg-gradient-to-r from-indigo-800 to-violet-600 hover:from-violet-800 hover:to-indigo-600 hover:drop-shadow-md transition-all ease-in">
-              Signup
+        <div className="w-full md:w-1/2 p-8">
+          <h2 className="text-3xl font-bold text-white mb-6">Sign Up</h2>
+          <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+            <div>
+              <label
+                htmlFor="name"
+                className="block text-sm font-medium text-gray-200 mb-1"
+              >
+                Name:
+              </label>
+              <input
+                id="name"
+                className="w-full px-3 py-2 bg-white/20 border border-gray-300 rounded-md text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                placeholder="Enter your name"
+                {...register("name", { required: "Name is required" })}
+              />
+              {errors.name && (
+                <p className="mt-1 text-sm text-red-400">
+                  {errors.name.message}
+                </p>
+              )}
+            </div>
+            <div>
+              <label
+                htmlFor="mobile"
+                className="block text-sm font-medium text-gray-200 mb-1"
+              >
+                Mobile Number:
+              </label>
+              <input
+                id="mobile"
+                className="w-full px-3 py-2 bg-white/20 border border-gray-300 rounded-md text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                placeholder="Enter your mobile number"
+                {...register("mobile", {
+                  required: "Mobile number is required",
+                  pattern: {
+                    value: /^[0-9]{10,14}$/,
+                    message: "Enter a valid mobile number (10-14 digits)",
+                  },
+                })}
+              />
+              {errors.mobile && (
+                <p className="mt-1 text-sm text-red-400">
+                  {errors.mobile.message}
+                </p>
+              )}
+            </div>
+            <div>
+              <label
+                htmlFor="email"
+                className="block text-sm font-medium text-gray-200 mb-1"
+              >
+                Email:
+              </label>
+              <input
+                id="email"
+                className="w-full px-3 py-2 bg-white/20 border border-gray-300 rounded-md text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                placeholder="Enter your email"
+                {...register("email", {
+                  required: "Email is required",
+                  pattern: {
+                    value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
+                    message: "Invalid email address",
+                  },
+                })}
+              />
+              {errors.email && (
+                <p className="mt-1 text-sm text-red-400">
+                  {errors.email.message}
+                </p>
+              )}
+            </div>
+            <div>
+              <label
+                htmlFor="password"
+                className="block text-sm font-medium text-gray-200 mb-1"
+              >
+                Password:
+              </label>
+              <input
+                type="password"
+                id="password"
+                className="w-full px-3 py-2 bg-white/20 border border-gray-300 rounded-md text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                placeholder="Enter your password"
+                {...register("password", {
+                  required: "Password is required",
+                  minLength: {
+                    value: 8,
+                    message: "Password must be at least 8 characters",
+                  },
+                  pattern: {
+                    value: /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}$/,
+                    message: "Password must contain letters and numbers",
+                  },
+                })}
+              />
+              {errors.password && (
+                <p className="mt-1 text-sm text-red-400">
+                  {errors.password.message}
+                </p>
+              )}
+            </div>
+            <div>
+              <label
+                htmlFor="image"
+                className="block text-sm font-medium text-gray-200 mb-1"
+              >
+                Upload Profile Image:
+              </label>
+              <div className="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-gray-300 border-dashed rounded-md">
+                <div className="space-y-1 text-center">
+                  <Upload className="mx-auto h-12 w-12 text-gray-400" />
+                  <div className="flex text-sm text-gray-600">
+                    <label
+                      htmlFor="image"
+                      className="relative cursor-pointer bg-white rounded-md font-medium text-indigo-600 hover:text-indigo-500 focus-within:outline-none focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-indigo-500"
+                    >
+                      <span>Upload a file</span>
+                      <input
+                        id="image"
+                        type="file"
+                        className="sr-only"
+                        accept="image/*"
+                        {...register("image")}
+                      />
+                    </label>
+                    <p className="pl-1 text-white">or drag and drop</p>
+                  </div>
+                  <p className="text-xs text-gray-400">
+                    PNG, JPG, GIF up to 10MB
+                  </p>
+                </div>
+              </div>
+            </div>
+            <button
+              type="submit"
+              className="w-full bg-gradient-to-r from-purple-600 to-indigo-600 text-white font-bold py-2 px-4 rounded-md hover:from-purple-700 hover:to-indigo-700 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-opacity-50 transition-all duration-200 ease-in-out transform hover:scale-105"
+            >
+              Sign Up
             </button>
-          </div>
-        </form>
-      </section>
+          </form>
+        </div>
+      </div>
     </div>
   );
 }
