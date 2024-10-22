@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef } from "react";
+import React, { useEffect, useState, useRef, useCallback } from "react";
 import { useForm } from "react-hook-form";
 import { motion, AnimatePresence } from "framer-motion";
 import { Paperclip, Plus, Trash2, X, Send, ArrowLeft } from "lucide-react";
@@ -26,14 +26,15 @@ export default function Inbox({ loggedInUser }) {
   const [isMobileView, setIsMobileView] = useState(false);
   const [showMessages, setShowMessages] = useState(false);
 
+  const handleResize = useCallback(() => {
+    setIsMobileView(window.innerWidth < 768);
+  }, []);
+
   useEffect(() => {
-    const handleResize = () => {
-      setIsMobileView(window.innerWidth < 768);
-    };
     handleResize();
     window.addEventListener("resize", handleResize);
     return () => window.removeEventListener("resize", handleResize);
-  }, []);
+  }, [handleResize]);
 
   useEffect(() => {
     if (conversation.length > 0 && currentConversationId) {
@@ -92,7 +93,7 @@ export default function Inbox({ loggedInUser }) {
     }
   }, [messages]);
 
-  const fetchConversation = async () => {
+  const fetchConversation = useCallback(async () => {
     try {
       const response = await fetch(`${apiUrl}/inbox`, {
         credentials: "include",
@@ -104,40 +105,43 @@ export default function Inbox({ loggedInUser }) {
     } catch (error) {
       console.log(`Error Here Is: ${error}`);
     }
-  };
+  }, []);
 
   useEffect(() => {
     fetchConversation();
-  }, []);
+  }, [fetchConversation]);
 
-  const getMessages = async (conversation_id, conversation_name) => {
-    try {
-      const response = await fetch(
-        `${apiUrl}/inbox/messages/${conversation_id}`,
-        { credentials: "include" }
-      );
-      const result = await response.json();
-      if (!result.errors && result.data) {
-        setFormVisible(true);
-        const { data } = result;
-        setParticipant(data.participant);
-        setCreator(data.creator);
-        setCurrentConversationId(conversation_id);
-        setCurrentConversationName(conversation_name);
-        setMessages(
-          data.messages && data.messages.length > 0 ? data.messages : []
+  const getMessages = useCallback(
+    async (conversation_id, conversation_name) => {
+      try {
+        const response = await fetch(
+          `${apiUrl}/inbox/messages/${conversation_id}`,
+          { credentials: "include" }
         );
-        if (isMobileView) {
-          setShowMessages(true);
+        const result = await response.json();
+        if (!result.errors && result.data) {
+          setFormVisible(true);
+          const { data } = result;
+          setParticipant(data.participant);
+          setCreator(data.creator);
+          setCurrentConversationId(conversation_id);
+          setCurrentConversationName(conversation_name);
+          setMessages(
+            data.messages && data.messages.length > 0 ? data.messages : []
+          );
+          if (isMobileView) {
+            setShowMessages(true);
+          }
+        } else {
+          toast.error("Error loading messages!");
         }
-      } else {
+      } catch (error) {
+        console.error("Failed to fetch messages:", error);
         toast.error("Error loading messages!");
       }
-    } catch (error) {
-      console.error("Failed to fetch messages:", error);
-      toast.error("Error loading messages!");
-    }
-  };
+    },
+    [isMobileView]
+  );
 
   const handleFileChange = (e) => {
     const files = Array.from(e.target.files);
@@ -147,7 +151,7 @@ export default function Inbox({ loggedInUser }) {
   const onSubmit = async (data) => {
     const formData = new FormData();
     formData.append("message", data.message);
-    if (selectedFiles) {
+    if (selectedFiles.length > 0) {
       selectedFiles.forEach((file) => formData.append("files", file));
     }
     formData.append("receiverId", participant.id);
@@ -225,9 +229,7 @@ export default function Inbox({ loggedInUser }) {
     }
   };
 
-  {
-    /* //conversation section */
-  }
+  /* conversation section */
   const ConversationList = () => (
     <section
       className={`${
@@ -306,9 +308,7 @@ export default function Inbox({ loggedInUser }) {
     </section>
   );
 
-  {
-    /* Message Section  */
-  }
+  /* Message Section  */
   const MessageSection = () => (
     <section className="flex-1 flex flex-col bg-black/10">
       {currentConversationName ? (
