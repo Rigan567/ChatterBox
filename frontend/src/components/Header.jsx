@@ -18,6 +18,7 @@ export default function Header({ loggedInUser, setIsLoggedIn, isLoggedIn }) {
       });
       if (response.ok) {
         setIsLoggedIn(false);
+        navigate("/");
       }
     } catch (error) {
       console.error("Error during logout:", error);
@@ -30,6 +31,7 @@ export default function Header({ loggedInUser, setIsLoggedIn, isLoggedIn }) {
         method: "DELETE",
         credentials: "include",
       });
+
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
@@ -177,7 +179,7 @@ export default function Header({ loggedInUser, setIsLoggedIn, isLoggedIn }) {
 
 const WarningTab = ({ message, handleConfirm }) => {
   return (
-    <div className="fixed inset-0 bg-black/60 w-full flex items-center justify-center p-4 z-50">
+    <div className="fixed  h-screen inset-0 bg-black/60 w-full flex items-center justify-center p-4 z-50">
       <div className="bg-white p-6 rounded-lg shadow-lg w-full max-w-md">
         <h3 className="text-lg font-semibold mb-4">{message}</h3>
         <div className="flex flex-col sm:flex-row justify-between gap-4">
