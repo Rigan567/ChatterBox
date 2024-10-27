@@ -14,12 +14,11 @@ export default function Header({ loggedInUser, setIsLoggedIn, isLoggedIn }) {
     try {
       const response = await fetch(`${apiUrl}/logout`, {
         method: "POST",
-        credentials: "include", // Ensure cookies are included
+        credentials: "include",
       });
       if (response.ok) {
         setIsLoggedIn(false);
         navigate("/");
-        console.log(isLoggedIn);
       } else {
         throw new Error("Logout failed");
       }
@@ -39,7 +38,7 @@ export default function Header({ loggedInUser, setIsLoggedIn, isLoggedIn }) {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
 
-      await handleLogout();
+      handleLogout();
       //  const result = response.json();
     } catch (error) {
       throw new Error("Fetching error:", error.message);

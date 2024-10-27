@@ -1,6 +1,7 @@
 const User = require("../models/People");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
+const path = require("path");
 
 const login = async (req, res) => {
   try {
@@ -48,12 +49,18 @@ const login = async (req, res) => {
 };
 
 const logout = (req, res) => {
-  res.clearCookie(process.env.COOKIE_NAME, {
-    httpOnly: true,
-    secure: process.env.NODE_ENV === "production",
-    sameSite: "none",
-  });
-  res.json({ message: "Logged out successfully" });
+  try {
+    res.clearCookie(process.env.COOKIE_NAME, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "none",
+      path: "/", // Ensure the path is set correctly
+    });
+    res.status(200).json({ message: "Logged out successfully" });
+  } catch (error) {
+    console.error("Logout error:", error);
+    res.status(500).json({ message: "Error logging out" });
+  }
 };
 
 module.exports = {
