@@ -30,11 +30,11 @@ export default function Header({ loggedInUser, setIsLoggedIn, isLoggedIn }) {
 
   const removeUser = async (userid) => {
     try {
-      await handleLogout();
       const deleteResponse = await fetch(`${apiUrl}/users/${userid}`, {
         method: "DELETE",
         credentials: "include",
       });
+      await handleLogout();
 
       if (!deleteResponse.ok) {
         throw new Error(`HTTP error! status: ${deleteResponse.status}`);
