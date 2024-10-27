@@ -99,7 +99,7 @@ export default function Inbox({ loggedInUser }) {
 
   useEffect(() => {
     fetchConversation();
-  }, [conversation]);
+  }, [conversation, removeConversation]);
 
   const getMessages = async (conversation_id, conversation_name) => {
     try {
