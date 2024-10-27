@@ -19,6 +19,7 @@ export default function Header({ loggedInUser, setIsLoggedIn, isLoggedIn }) {
       if (response.ok) {
         setIsLoggedIn(false);
         navigate("/");
+        console.log(isLoggedIn);
       } else {
         throw new Error("Logout failed");
       }
