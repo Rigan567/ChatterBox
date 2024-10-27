@@ -4,6 +4,7 @@ const { unlink } = require("fs");
 const path = require("path");
 const Conversation = require("../models/Conversation");
 const Message = require("../models/Message");
+const { logout } = require("./loginController");
 
 const getUsers = async (req, res, next) => {
   try {
@@ -69,42 +70,45 @@ const removeUser = async (req, res, next) => {
         { "participant.id": req.user.userid },
       ],
     });
-    await Conversation.deleteMany({
-      $or: [
-        { "creator.id": req.params.userid },
-        { "participant.id": req.params.userid },
-      ],
-    });
-    // Delete all messages associated with those conversations
-    for (const conversation of conversations) {
-      const messages = await Message.find({
-        conversation_id: conversation._id,
+    if (conversations) {
+      await Conversation.deleteMany({
+        $or: [
+          { "creator.id": req.params.userid },
+          { "participant.id": req.params.userid },
+        ],
       });
+      // Delete all messages associated with those conversations
+      for (const conversation of conversations) {
+        const messages = await Message.find({
+          conversation_id: conversation._id,
+        });
 
-      // Delete all attachments associated with messages
-      for (const message of messages) {
-        if (message.attachment && message.attachment.length > 0) {
-          message.attachment.forEach((attachment) => {
-            unlink(
-              path.join(
-                __dirname,
-                `/../public/uploads/attachments/${attachment}`
-              ),
-              (err) => {
-                if (err) console.error("Error deleting attachment:", err);
-              }
-            );
-          });
+        // Delete all attachments associated with messages
+        for (const message of messages) {
+          if (message.attachment && message.attachment.length > 0) {
+            message.attachment.forEach((attachment) => {
+              unlink(
+                path.join(
+                  __dirname,
+                  `/../public/uploads/attachments/${attachment}`
+                ),
+                (err) => {
+                  if (err) console.error("Error deleting attachment:", err);
+                }
+              );
+            });
+          }
         }
+        await Message.deleteMany({
+          conversation_id: conversation._id,
+        });
       }
-      await Message.deleteMany({
-        conversation_id: conversation._id,
-      });
-
-      res.status(200).json({
-        message: "Removed",
-      });
+    } else {
+      console.log("No conversations for this User!");
     }
+    res.status(200).json({
+      message: "Removed",
+    });
   } catch (error) {
     res.status(500).json({
       errors: {
