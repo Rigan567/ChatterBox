@@ -29,20 +29,27 @@ export default function Header({ loggedInUser, setIsLoggedIn, isLoggedIn }) {
 
   const removeUser = async (userid) => {
     try {
-      const response = await fetch(`${apiUrl}/users/${userid}`, {
+      const deleteResponse = await fetch(`${apiUrl}/users/${userid}`, {
         method: "DELETE",
         credentials: "include",
       });
 
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      } else {
-        await handleLogout();
+      if (!deleteResponse.ok) {
+        throw new Error(`HTTP error! status: ${deleteResponse.status}`);
       }
 
-      //  const result = response.json();
+      const logoutResponse = await fetch(`${apiUrl}/logout`, {
+        method: "POST",
+        credentials: "include",
+      });
+
+      if (!logoutResponse.ok) {
+        throw new Error("Logout failed after account removal");
+      }
+      setIsLoggedIn(false);
+      navigate("/");
     } catch (error) {
-      throw new Error("Fetching error:", error.message);
+      console.error("Error during account removal or logout:", error.message);
     }
   };
 
