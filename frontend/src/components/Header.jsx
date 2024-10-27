@@ -20,11 +20,13 @@ export default function Header({ loggedInUser, setIsLoggedIn, isLoggedIn }) {
       if (response.ok) {
         setIsLoggedIn(false);
         navigate("/");
+        toast.success("Logged out successfully.");
       } else {
         throw new Error("Logout failed");
       }
     } catch (error) {
       console.error("Error during logout:", error);
+      toast.error("Error during logout.");
     }
   };
 
@@ -34,11 +36,12 @@ export default function Header({ loggedInUser, setIsLoggedIn, isLoggedIn }) {
         method: "DELETE",
         credentials: "include",
       });
-      await handleLogout();
 
       if (!deleteResponse.ok) {
         throw new Error(`HTTP error! status: ${deleteResponse.status}`);
       }
+      toast.success(`Account of ${loggedInUser.username} removed successfully`);
+      await handleLogout();
     } catch (error) {
       console.error("Error during account removal or logout:", error.message);
     }
