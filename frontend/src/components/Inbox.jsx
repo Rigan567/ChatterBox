@@ -4,6 +4,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Paperclip, Plus, Trash2, X, Send, ArrowLeft } from "lucide-react";
 import SearchUserTab from "./SearchUserTab";
 import moment from "moment";
+import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import io from "socket.io-client";
 import noPhoto from "../assets/images/images.jpeg";
@@ -24,7 +25,7 @@ export default function Inbox({ loggedInUser }) {
   const { register, handleSubmit, reset, watch } = useForm();
   const [displayUser, setDisplayUser] = useState(null);
   const [showMobileMessages, setShowMobileMessages] = useState(false);
-
+  const navigate = useNavigate();
   useEffect(() => {
     if (conversation.length > 0 && currentConversationId) {
       const conv = conversation.find((c) => c._id === currentConversationId);
@@ -99,7 +100,7 @@ export default function Inbox({ loggedInUser }) {
 
   useEffect(() => {
     fetchConversation();
-  }, [conversation, removeConversation]);
+  }, [conversation]);
 
   const getMessages = async (conversation_id, conversation_name) => {
     try {
@@ -204,6 +205,7 @@ export default function Inbox({ loggedInUser }) {
         );
         setCurrentConversationName(null);
         fetchConversation();
+        navigate("/inbox");
       }
     } catch (error) {
       toast.error(error.msg);
