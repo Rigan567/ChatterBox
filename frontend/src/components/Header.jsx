@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { EllipsisVertical, X, Menu } from "lucide-react";
 import { apiUrl } from "../config";
+import { toast } from "react-toastify";
 
 export default function Header({ loggedInUser, setIsLoggedIn, isLoggedIn }) {
   const navigate = useNavigate();
@@ -29,6 +30,7 @@ export default function Header({ loggedInUser, setIsLoggedIn, isLoggedIn }) {
 
   const removeUser = async (userid) => {
     try {
+      await handleLogout();
       const deleteResponse = await fetch(`${apiUrl}/users/${userid}`, {
         method: "DELETE",
         credentials: "include",
@@ -37,17 +39,6 @@ export default function Header({ loggedInUser, setIsLoggedIn, isLoggedIn }) {
       if (!deleteResponse.ok) {
         throw new Error(`HTTP error! status: ${deleteResponse.status}`);
       }
-
-      const logoutResponse = await fetch(`${apiUrl}/logout`, {
-        method: "POST",
-        credentials: "include",
-      });
-
-      if (!logoutResponse.ok) {
-        throw new Error("Logout failed after account removal");
-      }
-      setIsLoggedIn(false);
-      navigate("/");
     } catch (error) {
       console.error("Error during account removal or logout:", error.message);
     }
