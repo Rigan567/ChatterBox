@@ -36,9 +36,10 @@ export default function Header({ loggedInUser, setIsLoggedIn, isLoggedIn }) {
 
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
+      } else {
+        await handleLogout();
       }
 
-      handleLogout();
       //  const result = response.json();
     } catch (error) {
       throw new Error("Fetching error:", error.message);
