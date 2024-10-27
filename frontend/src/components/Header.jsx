@@ -144,6 +144,14 @@ export default function Header({ loggedInUser, setIsLoggedIn, isLoggedIn }) {
                 {item}
               </button>
             ))}
+            {loggedInUser && (
+              <button
+                className="block w-full text-left text-white hover:text-gray-300 transition-colors duration-200 py-2"
+                onClick={handleRemoveClick}
+              >
+                Remove Account
+              </button>
+            )}
           </nav>
         )}
       </div>
@@ -169,20 +177,19 @@ export default function Header({ loggedInUser, setIsLoggedIn, isLoggedIn }) {
 
 const WarningTab = ({ message, handleConfirm }) => {
   return (
-    <div className="fixed border h-screen inset-0 bg-black/60 w-full flex items-center justify-center ">
-      <div className="bg-white p-6 rounded-lg shadow-lg max-w-md">
-        {" "}
+    <div className="fixed inset-0 bg-black/60 w-full flex items-center justify-center p-4 z-50">
+      <div className="bg-white p-6 rounded-lg shadow-lg w-full max-w-md">
         <h3 className="text-lg font-semibold mb-4">{message}</h3>
-        <div className="flex justify-between gap-4">
+        <div className="flex flex-col sm:flex-row justify-between gap-4">
           <button
-            className="bg-red-500 hover:bg-red-600 text-white py-2 px-4 rounded-lg"
-            onClick={() => handleConfirm(true)} // Call handleConfirm with 'true' to proceed
+            className="w-full sm:w-auto bg-red-500 hover:bg-red-600 text-white py-2 px-4 rounded-lg transition-colors duration-200"
+            onClick={() => handleConfirm(true)}
           >
             Yes, Remove
           </button>
           <button
-            className="bg-gray-400 hover:bg-gray-500 text-white py-2 px-4 rounded-lg"
-            onClick={() => handleConfirm(false)} // Call handleConfirm with 'false' to cancel
+            className="w-full sm:w-auto bg-gray-400 hover:bg-gray-500 text-white py-2 px-4 rounded-lg transition-colors duration-200"
+            onClick={() => handleConfirm(false)}
           >
             No, Cancel
           </button>
