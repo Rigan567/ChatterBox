@@ -19,6 +19,8 @@ export default function Header({ loggedInUser, setIsLoggedIn, isLoggedIn }) {
       if (response.ok) {
         setIsLoggedIn(false);
         navigate("/");
+      } else {
+        throw new Error("Logout failed");
       }
     } catch (error) {
       console.error("Error during logout:", error);
@@ -36,7 +38,7 @@ export default function Header({ loggedInUser, setIsLoggedIn, isLoggedIn }) {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
 
-      handleLogout();
+      await handleLogout();
       //  const result = response.json();
     } catch (error) {
       throw new Error("Fetching error:", error.message);
