@@ -102,7 +102,7 @@ const removeUser = async (req, res, next) => {
       });
 
       res.status(200).json({
-        message: "User was removed successfully",
+        message: "Removed",
       });
     }
   } catch (error) {

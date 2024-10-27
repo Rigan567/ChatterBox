@@ -37,11 +37,16 @@ export default function Header({ loggedInUser, setIsLoggedIn, isLoggedIn }) {
         credentials: "include",
       });
 
-      if (!deleteResponse.ok) {
-        throw new Error(`HTTP error! status: ${deleteResponse.status}`);
+      if (deleteResponse.ok) {
+        const result = await deleteResponse.json();
+        if (result.message === "Removed") {
+          toast.success(
+            `Account of ${loggedInUser.username} removed successfully`
+          );
+          await handleLogout();
+        }
       }
-      toast.success(`Account of ${loggedInUser.username} removed successfully`);
-      await handleLogout();
+      throw new Error(`HTTP error! status: ${deleteResponse.status}`);
     } catch (error) {
       console.error("Error during account removal or logout:", error.message);
     }
